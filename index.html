@@ -47,7 +47,8 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .main{display:grid;gap:18px;padding-top:16px}
 .has-app .main{grid-template-columns:minmax(0,1fr)}
 @media(min-width:1000px){.has-app .main{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:start}
-  .boardcol{position:sticky;top:var(--bartop,70px)}}
+  .boardcol{position:sticky;top:var(--bartop,70px)}
+  .has-app .anscol{position:sticky;top:var(--bartop,70px);max-height:calc(100vh - var(--bartop,70px) - 10px);overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}}
 .frame{position:relative;border:1px solid var(--line);background:var(--card)}
 .frame::before,.frame::after,.frame>.c1,.frame>.c2{content:"";position:absolute;width:9px;height:9px;pointer-events:none}
 .frame::before{top:-1px;left:-1px;border-top:2px solid var(--fc,var(--amber));border-left:2px solid var(--fc,var(--amber))}
@@ -55,7 +56,9 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .frame>.c1{bottom:-1px;left:-1px;border-bottom:2px solid var(--fc,var(--amber));border-left:2px solid var(--fc,var(--amber))}
 .frame>.c2{bottom:-1px;right:-1px;border-bottom:2px solid var(--fc,var(--amber));border-right:2px solid var(--fc,var(--amber))}
 .boardcol{display:flex;flex-direction:column;gap:10px}
-.board{padding:12px;container-type:inline-size;--fc:var(--acc)}
+.board{padding:12px;--fc:var(--acc)}
+.board-in{display:flex;flex-direction:column;gap:12px}
+.gridwrap{container-type:inline-size;flex:1 1 0;width:100%}
 .cap-h{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.14em;color:var(--amberd);margin-bottom:8px;text-transform:uppercase}
 .note{font-size:11px;color:var(--dim);margin:0 0 10px;line-height:1.5}
 .grid{--k:calc((100cqw - 26px) / 17.5);display:grid;grid-template-columns:10px repeat(16,var(--k));grid-template-rows:10px repeat(8,var(--k));gap:calc(var(--k)*.1)}
@@ -70,7 +73,7 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .key.press{background:var(--cream)!important;border-color:var(--cream)!important;color:#0A0908!important;box-shadow:0 0 8px var(--cream)}
 .key.picked{outline:2px solid var(--acc);outline-offset:1px}
 .hn{font:700 calc(var(--k)*.36)/1 var(--fm)}
-.lower{display:flex;gap:14px;margin-top:12px;align-items:flex-start;flex-wrap:wrap}
+.lower{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
 .e16wrap{flex:none}
 .layers{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
 .layers button{font-size:9.5px;letter-spacing:.06em;padding:3px 7px;background:none;border:1px solid var(--line);color:var(--dim);cursor:pointer;text-transform:uppercase}
@@ -102,13 +105,14 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .sec-h h3{margin:0;font-size:12px;letter-spacing:.08em;color:var(--sc,var(--acc));text-transform:uppercase}
 .sec-h span{font-size:9px;letter-spacing:.12em;color:var(--sc,var(--acc));opacity:.7;text-transform:uppercase}
 .rows{padding:2px 6px 6px}
-.row{display:grid;grid-template-columns:minmax(0,1fr);gap:1px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:9px 8px;cursor:pointer;color:inherit;border-left:2px solid transparent}
+.row{display:grid;grid-template-columns:minmax(0,1fr);gap:1px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:7px 8px;cursor:pointer;color:inherit;border-left:2px solid transparent}
 .row:last-child{border-bottom:0}
 .row:hover{background:rgba(255,255,255,.025)}
 .row.on{border-left-color:var(--sc,var(--acc));background:color-mix(in srgb,var(--sc,var(--acc)) 8%,transparent)}
 .rt{font-weight:700;font-size:12.5px;color:var(--sc,var(--acc));letter-spacing:.02em}
 .rw{font-size:12px;color:var(--cream)}
-.rd{font-size:11.5px;color:var(--dim);line-height:1.45}
+.rd{font-size:11.5px;color:var(--dim);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.row.on .rd,.row:focus-visible .rd{display:block}
 .app{font-size:9.5px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
 .badge{display:inline-flex;align-items:center;padding:1px 7px 1px 5px;font-size:10px;font-weight:700;color:var(--amber);margin-left:6px;vertical-align:1px;
   background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--amber) 22%,transparent))}
@@ -122,6 +126,11 @@ mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:inherit;pa
 @media(max-width:700px){.bar{position:static}}
 @media(max-width:600px){.page,.barin{padding-left:10px;padding-right:10px}h1{font-size:11px}.e16{grid-template-columns:repeat(4,42px)}.knob{width:42px;height:42px}}
 @media(prefers-reduced-motion:no-preference){.row,.key,.knob{transition:background .12s,box-shadow .12s}}
+@media(min-width:1180px){.page,.barin{max-width:none;padding-left:22px;padding-right:22px}
+  .has-app .main{grid-template-columns:minmax(0,2fr) minmax(360px,1fr)}
+  .board-in{flex-direction:row;align-items:flex-start}.gridwrap{width:auto}
+  .lower{flex:0 0 214px;flex-direction:column;gap:12px}
+  .side{flex:none}}
 </style>
 </head>
 <body>
@@ -140,7 +149,8 @@ mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:inherit;pa
       <div class="frame board"><i class="c1"></i><i class="c2"></i>
         <div class="cap-h"><span>GRID_128 / OXI_E16</span><span id="appcode"></span></div>
         <p class="note" id="note"></p>
-        <div class="grid" id="grid"></div>
+        <div class="board-in">
+        <div class="gridwrap"><div class="grid" id="grid"></div></div>
         <div class="lower">
           <div class="e16wrap"><div class="layers" id="layers"></div><div class="e16" id="e16"></div></div>
           <div class="side">
@@ -154,6 +164,7 @@ mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:inherit;pa
             </div>
             <div class="enote" id="enote"></div>
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -640,7 +651,7 @@ function results(){
 
 function row(e, showApp){
   return '<button type="button" class="row' + (state.active === e.id ? " on" : "") + '" data-id="' + e.id + '" style="--sc:' + ACC[e.app] + '">' +
-    (showApp ? '<span class="app">' + esc(APPS[e.app].name) + " · " + esc(e.s) + "</span>" : "") +
+    (showApp ? '<span class="app">' + (state.app === e.app ? "" : esc(APPS[e.app].name) + " · ") + esc(e.s) + "</span>" : "") +
     '<span class="rt">' + hl(e.t) + (e.badge ? '<span class="badge">' + esc(e.badge) + "</span>" : "") + "</span>" +
     '<span class="rw">' + hl(e.how) + (e.norns ? '<span class="chip">' + esc(e.norns) + "</span>" : "") + "</span>" +
     (e.d ? '<span class="rd">' + hl(e.d) + "</span>" : "") + "</button>";
