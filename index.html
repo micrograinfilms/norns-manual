@@ -25,10 +25,10 @@ body{color:var(--cream);font:12px/1.5 var(--fm);overflow-x:clip;padding-bottom:6
   background-image:repeating-linear-gradient(180deg,var(--scan) 0,var(--scan) 1px,transparent 1px,transparent 3px)}
 button{font-family:inherit}
 button:focus-visible,input:focus-visible{outline:1px solid var(--acc);outline-offset:2px}
-.page{max-width:1400px;margin:0 auto;padding:0 18px}
+.page{margin:0 auto;padding:0 22px}
 /* bar */
 .bar{position:sticky;top:0;z-index:5;background:rgba(10,9,8,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(4px)}
-.barin{max-width:1400px;margin:0 auto;padding:10px 18px 8px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.barin{margin:0 auto;padding:10px 18px 8px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
 h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;white-space:nowrap}
 .search{position:relative;flex:1 1 280px;max-width:520px}
 .search input{width:100%;font:400 16px var(--fm);padding:7px 34px 7px 10px;background:var(--card);border:1px solid var(--line);color:var(--cream);border-radius:0}
@@ -44,11 +44,7 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .tries button{background:none;border:0;padding:0;color:var(--dim);cursor:pointer;font-size:10.5px;border-bottom:1px dotted var(--line)}
 .tries button:hover{color:var(--amber)}
 /* main layout */
-.main{display:grid;gap:18px;padding-top:16px}
-.has-app .main{grid-template-columns:minmax(0,1fr)}
-@media(min-width:1000px){.has-app .main{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:start}
-  .boardcol{position:sticky;top:var(--bartop,70px)}
-  .has-app .anscol{position:sticky;top:var(--bartop,70px);max-height:calc(100vh - var(--bartop,70px) - 10px);overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}}
+.main{display:flex;flex-direction:column;gap:18px;padding-top:16px}
 .frame{position:relative;border:1px solid var(--line);background:var(--card)}
 .frame::before,.frame::after,.frame>.c1,.frame>.c2{content:"";position:absolute;width:9px;height:9px;pointer-events:none}
 .frame::before{top:-1px;left:-1px;border-top:2px solid var(--fc,var(--amber));border-left:2px solid var(--fc,var(--amber))}
@@ -57,8 +53,29 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .frame>.c2{bottom:-1px;right:-1px;border-bottom:2px solid var(--fc,var(--amber));border-right:2px solid var(--fc,var(--amber))}
 .boardcol{display:flex;flex-direction:column;gap:10px}
 .board{padding:12px;--fc:var(--acc)}
-.board-in{display:flex;flex-direction:column;gap:12px}
-.gridwrap{container-type:inline-size;flex:1 1 0;width:100%}
+.board-in{display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start}
+.gridwrap{container-type:inline-size;flex:2 1 560px;max-width:1120px}
+.e16col{flex:0 0 auto;display:flex;flex-direction:column;gap:8px;width:204px}
+.insp{flex:1 1 320px;display:flex;flex-direction:column;gap:10px;min-height:200px}
+@media(max-width:999px){.gridwrap{flex-basis:100%;max-width:none}}
+.key{position:relative}
+.gl{position:absolute;top:1px;right:2px;font:700 calc(var(--k)*.17)/1 var(--fm);color:var(--cream);opacity:.9;letter-spacing:-.02em;pointer-events:none}
+@container (max-width:470px){.gl{font-size:0;width:4px;height:4px;border-radius:50%;background:var(--cream);top:2px;right:2px;box-shadow:0 0 3px var(--cream)}}
+.key.partner{outline:2px solid var(--acc);outline-offset:1px;box-shadow:0 0 10px var(--acc)}
+.key.zone{outline:1px dashed var(--acc);outline-offset:1px}
+.ih{font-size:9.5px;letter-spacing:.14em;color:var(--amberd);text-transform:uppercase}
+.it{font-weight:700;font-size:13px;color:var(--acc)}
+.ii{font-size:11.5px;color:var(--dim);line-height:1.5}
+.det{border-left:2px solid var(--acc);padding:4px 0 4px 10px;background:color-mix(in srgb,var(--acc) 6%,transparent)}
+.det .how{font-size:12px;color:var(--cream);margin-top:2px}.det p{margin:4px 0 0;font-size:11.5px;color:var(--dim);line-height:1.5}
+.mvs{display:flex;flex-direction:column;gap:6px}
+.mv{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);padding:6px;cursor:pointer;color:inherit}
+.mv:hover{border-color:var(--amberd)}.mv.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 8%,var(--card2))}
+.mv .mt{font-weight:700;font-size:11.5px;color:var(--acc);display:block}.mv .mh{font-size:11px;color:var(--cream);display:block;line-height:1.4}
+.mg{display:grid;grid-template-columns:repeat(16,8px);grid-template-rows:repeat(8,8px);gap:1px;flex:none}
+.mg i{border-radius:1px;font:700 7px/8px var(--fm);font-style:normal;text-align:center;color:#0A0908}
+.mg i.hold{background:var(--amber)!important;box-shadow:0 0 4px var(--amber)}.mg i.press{background:var(--cream)!important;box-shadow:0 0 4px var(--cream)}
+.mk{font:700 9px var(--fm);color:var(--cream);border:1px solid var(--line);padding:1px 4px;flex:none;align-self:center}
 .cap-h{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.14em;color:var(--amberd);margin-bottom:8px;text-transform:uppercase}
 .note{font-size:11px;color:var(--dim);margin:0 0 10px;line-height:1.5}
 .grid{--k:calc((100cqw - 26px) / 17.5);display:grid;grid-template-columns:10px repeat(16,var(--k));grid-template-rows:10px repeat(8,var(--k));gap:calc(var(--k)*.1)}
@@ -90,7 +107,8 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .cap b{color:var(--acc);font-size:12.5px}.cap .how{color:var(--cream);margin-top:2px}.cap p{margin:4px 0 0;color:var(--dim)}
 .cap.empty{color:var(--dim)}
 .enote{font-size:10.5px;color:var(--dim);line-height:1.45}
-.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:10px;color:var(--dim)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:10px;color:var(--dim);border-top:1px solid var(--line);padding-top:8px}
+.legend b{color:var(--cream);margin-right:4px}
 .legend i{display:inline-flex;width:13px;height:13px;vertical-align:-2px;margin-right:5px;align-items:center;justify-content:center;font:700 8px var(--fm);font-style:normal;color:#0A0908}
 /* answers */
 .head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
@@ -98,8 +116,8 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .count{font-size:10px;color:var(--dim);letter-spacing:.08em}
 .clear{font-size:10px;letter-spacing:.08em;margin-left:8px;padding:3px 8px;background:none;border:1px solid var(--amber);color:var(--amber);cursor:pointer;text-transform:uppercase}
 .results{display:flex;flex-direction:column;gap:14px}
-.all .results{display:block;columns:2 460px;column-gap:16px}
-.all .results>.frame{break-inside:avoid;margin-bottom:14px}
+.results{display:block!important;columns:3 380px;column-gap:16px}
+.results>.frame{break-inside:avoid;margin-bottom:14px}
 .sec{--fc:var(--sc,var(--acc))}
 .sec-h{display:flex;justify-content:space-between;align-items:baseline;padding:10px 14px 8px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--sc,var(--acc)) 7%,transparent)}
 .sec-h h3{margin:0;font-size:12px;letter-spacing:.08em;color:var(--sc,var(--acc));text-transform:uppercase}
@@ -122,15 +140,9 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:inherit;padding:0 1px}
 .empty-state{padding:16px;color:var(--dim)}
 .src{font-size:10px;color:var(--amberd);letter-spacing:.08em;margin-top:18px}
-@media(max-width:999px){.searching .anscol{order:-1}}
 @media(max-width:700px){.bar{position:static}}
 @media(max-width:600px){.page,.barin{padding-left:10px;padding-right:10px}h1{font-size:11px}.e16{grid-template-columns:repeat(4,42px)}.knob{width:42px;height:42px}}
 @media(prefers-reduced-motion:no-preference){.row,.key,.knob{transition:background .12s,box-shadow .12s}}
-@media(min-width:1180px){.page,.barin{max-width:none;padding-left:22px;padding-right:22px}
-  .has-app .main{grid-template-columns:minmax(0,2fr) minmax(360px,1fr)}
-  .board-in{flex-direction:row;align-items:flex-start}.gridwrap{width:auto}
-  .lower{flex:0 0 214px;flex-direction:column;gap:12px}
-  .side{flex:none}}
 </style>
 </head>
 <body>
@@ -150,21 +162,9 @@ mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:inherit;pa
         <div class="cap-h"><span>GRID_128 / OXI_E16</span><span id="appcode"></span></div>
         <p class="note" id="note"></p>
         <div class="board-in">
-        <div class="gridwrap"><div class="grid" id="grid"></div></div>
-        <div class="lower">
-          <div class="e16wrap"><div class="layers" id="layers"></div><div class="e16" id="e16"></div></div>
-          <div class="side">
-            <div class="cap empty" id="cap"></div>
-            <div class="legend" id="legend">
-              <span><i style="background:var(--amber)">H</i>hold</span>
-              <span><i style="background:var(--cream)">1</i>press in order</span>
-              <span><i style="background:var(--cream)">2x</i>double tap</span>
-              <span><i style="background:var(--cream);border-radius:50%">↻</i>turn</span>
-              <span><i style="background:var(--cream);border-radius:50%">●</i>push</span>
-            </div>
-            <div class="enote" id="enote"></div>
-          </div>
-        </div>
+          <div class="gridwrap"><div class="grid" id="grid"></div></div>
+          <div class="e16col"><div class="layers" id="layers"></div><div class="e16" id="e16"></div><div class="enote" id="enote"></div></div>
+          <div class="insp" id="insp"></div>
         </div>
       </div>
     </div>
@@ -574,8 +574,47 @@ function keyStyle(k){ const t = k.tint==null ? .85 : k.tint, g = G(k.grp);
 const ACC = {mutated:"var(--green)", cb:"var(--red)", fractured:"var(--cyan)", still:"var(--amber)"};
 const CODE = {mutated:"MUTATED / 12 TRK", cb:"CIRCUIT_BREAKER / 4 STRIP", fractured:"FRACTURED / 4 LOOP", still:"STILL / 6 VOICE"};
 
+/* keys that work the same way share a zone, so a move shown on one example key belongs to all of them */
+function zone(app, r, c){
+  if (app === "mutated"){ if (r <= 6) return "track"; if (r === 7) return "cycle"; if (c >= 4 && c <= 7) return "steppage"; }
+  if (app === "cb"){
+    if (r <= 4){ if (c === 1) return "loop"; if (c >= 2 && c <= 7) return "box"; if (c === 8) return "out"; if (c === 9) return "clr"; if (c >= 11 && c <= 14) return "pat"; if (c === 16) return "play"; }
+    else if (c <= 9) return "pitch";
+    if (r === 8 && c >= 11 && c <= 14) return "page";
+  }
+  if (app === "fractured"){
+    if (c === 1) return "vel"; if (c >= 2 && c <= 8) return "kbd";
+    if (r <= 4 && c >= 11 && c <= 14) return "pat"; if (r <= 4 && c === 16) return "loop";
+    if (r === 5 && c >= 10) return "fader"; if (r === 6 && c >= 10 && c <= 12) return "sendsel";
+    if (r === 8 && c >= 11 && c <= 14) return "page";
+  }
+  if (app === "still"){ if (r <= 6) return "voice"; if (r === 7) return "pat"; if (r === 8 && c <= 6) return "sel"; }
+  return "k" + r + "," + c;
+}
+const GLYPH = {};
+ORDER.forEach(app => {
+  const z = {}; const add = (k, g) => { const id = zone(app, k[0], k[1]); (z[id] = z[id] || new Set()).add(g); };
+  ENTRIES.filter(e => e.app === app).forEach(e => {
+    const h = e.hold || [], p = e.press || [];
+    const combo = h.length && (p.length || e.knob || h.length > 1);
+    if (combo) h.forEach(k => add(k, "H"));
+    p.forEach(k => { if (e.x2) add(k, "2×"); else if (h.length) add(k, "+"); else if (e.same && p.length > 1) add(k, "&"); });
+  });
+  GLYPH[app] = z;
+});
+function glyphs(app, r, c){ const s = GLYPH[app][zone(app, r, c)]; return s ? ["2×","H","+","&"].filter(g => s.has(g)).join(" ") : ""; }
+
+function usesPick(e, p){
+  if (e.app !== state.app) return false;
+  if (p.type === "key"){ const z = zone(e.app, p.r, p.c); return [...(e.hold||[]), ...(e.press||[])].some(k => zone(e.app, k[0], k[1]) === z); }
+  return e.knob && e.knob[0] === p.n && (!e.layer || e.layer === p.layer || !e.kref);
+}
+function pickMoves(){ return state.pick ? ENTRIES.filter(e => usesPick(e, state.pick)) : []; }
+
 function drawGrid(){
   const a = state.app, g = APPS[a].grid(), e = state.active != null ? ENTRIES[state.active] : null, m = e ? marks(e) : {};
+  const partner = {}, pz = state.pick && state.pick.type === "key" ? zone(a, state.pick.r, state.pick.c) : null;
+  if (state.pick && !e) pickMoves().forEach(x => [...(x.hold||[]), ...(x.press||[])].forEach(k => { if (!pz || zone(a, k[0], k[1]) !== pz) partner[k[0]+","+k[1]] = 1; }));
   let h = "<div></div>";
   for (let c = 1; c <= 16; c++) h += '<div class="num">' + c + "</div>";
   for (let r = 1; r <= 8; r++){
@@ -584,8 +623,10 @@ function drawGrid(){
       const k = g[r-1][c-1], mk = m[r+","+c], pos = "grid-row:" + (r+1) + ";grid-column:" + (c+1) + ";";
       const picked = state.pick && state.pick.type === "key" && state.pick.r === r && state.pick.c === c;
       if (!k){ h += '<div class="key dark' + (mk ? " " + mk[0] : "") + '" style="' + pos + '">' + (mk ? '<span class="hn">' + mk[1] + "</span>" : "") + "</div>"; continue; }
-      h += '<button type="button" class="key' + (mk ? " " + mk[0] : "") + (picked ? " picked" : "") + '" data-r="' + r + '" data-c="' + c + '" aria-label="Row ' + r + " key " + c + " " + esc(k.t || k.s || "") + '" style="' + pos + (mk ? "" : keyStyle(k)) + '">' +
-        (mk ? '<span class="hn">' + mk[1] + "</span>" : "") + (k.t ? '<span class="t">' + esc(k.t) + "</span>" : "") + (k.s ? '<span class="s">' + esc(k.s) + "</span>" : "") + "</button>";
+      const cls = "key" + (mk ? " " + mk[0] : "") + (picked ? " picked" : "") + (!mk && partner[r+","+c] ? " partner" : "") + (!mk && !picked && pz && zone(a, r, c) === pz && !e ? " zone" : "");
+      const gl = glyphs(a, r, c);
+      h += '<button type="button" class="' + cls + '" data-r="' + r + '" data-c="' + c + '" aria-label="Row ' + r + " key " + c + " " + esc(k.t || k.s || "") + '" style="' + pos + (mk ? "" : keyStyle(k)) + '">' +
+        (gl && !mk ? '<span class="gl">' + gl + "</span>" : "") + (mk ? '<span class="hn">' + mk[1] + "</span>" : "") + (k.t ? '<span class="t">' + esc(k.t) + "</span>" : "") + (k.s ? '<span class="s">' + esc(k.s) + "</span>" : "") + "</button>";
     }
   }
   $("grid").innerHTML = h;
@@ -603,24 +644,30 @@ function drawE16(){
   }).join("");
   $("enote").textContent = KNOBNOTE[a];
 }
-function drawCap(){
-  const cap = $("cap"), e = state.active != null ? ENTRIES[state.active] : null, p = state.pick;
-  if (e){
-    cap.className = "cap";
-    cap.innerHTML = (e.badge ? '<span class="badge">' + esc(e.badge) + "</span><br>" : "") + "<b>" + esc(e.t) + '</b><div class="how">' + esc(e.how) + (e.norns ? ' <span class="chip">' + esc(e.norns) + "</span>" : "") + "</div>" + (e.d ? "<p>" + esc(e.d) + "</p>" : "");
-  } else if (p){
-    cap.className = "cap";
-    cap.innerHTML = "<b>" + esc(p.title) + "</b><p>" + esc(p.info) + "</p>";
-  } else {
-    cap.className = "cap empty";
-    cap.textContent = "Tap a key or knob: what it does, and every move that uses it. Tap an answer to light its keys.";
+function miniGrid(e){
+  const g = APPS[e.app].grid(), m = marks(e);
+  let h = '<span class="mg" aria-hidden="true">';
+  for (let r = 1; r <= 8; r++) for (let c = 1; c <= 16; c++){
+    const k = g[r-1][c-1], mk = m[r+","+c];
+    h += '<i class="' + (mk ? mk[0] : "") + '" style="background:' + (k ? "color-mix(in srgb, " + G(k.grp) + " 16%, #16130F)" : "#0A0908") + '">' + (mk ? (mk[1] === "2x" ? "2" : mk[1]) : "") + "</i>";
   }
+  return h + "</span>";
 }
-
-function usesPick(e, p){
-  if (e.app !== state.app) return false;
-  if (p.type === "key") return [...(e.hold||[]), ...(e.press||[])].some(k => k[0] === p.r && k[1] === p.c);
-  return e.knob && e.knob[0] === p.n && (!e.layer || e.layer === p.layer || !e.kref);
+const LEGEND = '<div class="legend"><span><b>2×</b>double tap</span><span><b>H</b>hold with another key</span><span><b>+</b>press while holding another</span><span><b>&amp;</b>press together</span>' +
+  '<span><i style="background:var(--amber)">H</i>hold</span><span><i style="background:var(--cream)">1</i>press in order</span><span><i style="background:var(--cream);border-radius:50%">↻</i>turn</span><span><i style="background:var(--cream);border-radius:50%">●</i>push</span></div>';
+function drawInsp(){
+  const e = state.active != null ? ENTRIES[state.active] : null, p = state.pick;
+  let h = "";
+  if (e) h += '<div class="det">' + (e.badge ? '<span class="badge" style="margin-left:0">' + esc(e.badge) + "</span><br>" : "") + '<span class="it">' + esc(e.t) + '</span><div class="how">' + esc(e.how) + (e.norns ? '<span class="chip">' + esc(e.norns) + "</span>" : "") + "</div>" + (e.d ? "<p>" + esc(e.d) + "</p>" : "") + "</div>";
+  if (p){
+    const list = pickMoves();
+    h += '<div><div class="ih">' + esc(p.title) + " · " + list.length + (list.length === 1 ? " move" : " moves") + '</div>' + (p.info ? '<div class="ii">' + esc(p.info) + "</div>" : "") + "</div>";
+    h += '<div class="mvs">' + list.map(x => '<button type="button" class="mv' + (state.active === x.id ? " on" : "") + '" data-id="' + x.id + '">' +
+      ((x.hold || x.press) ? miniGrid(x) + (x.knob ? '<span class="mk">' + (x.knob[1] === "turn" ? "↻" : "●") + " K" + x.knob[0] + "</span>" : "") : '<span class="mk">' + (x.knob ? (x.knob[1] === "turn" ? "↻" : "●") + " K" + x.knob[0] : "norns") + "</span>") +
+      '<span><span class="mt">' + esc(x.t) + (x.badge ? '<span class="badge">' + esc(x.badge) + "</span>" : "") + '</span><span class="mh">' + esc(x.how) + "</span></span></button>").join("") + "</div>";
+  }
+  if (!e && !p) h += '<div class="ii">Tap any key or knob to see every move it is part of, drawn on a small grid. Tap a move to light it on the big board. Marks in the corner of a key show what it combines with.</div>';
+  $("insp").innerHTML = h + LEGEND;
 }
 
 function results(){
@@ -628,10 +675,7 @@ function results(){
   const app = qApp || state.app;
   markRe = null;
   let list, title, loose = false;
-  if (state.pick && !state.q){
-    list = ENTRIES.filter(e => usesPick(e, state.pick));
-    title = "Moves that use " + state.pick.title;
-  } else if (toks.length){
+  if (toks.length){
     const pool = ENTRIES.filter(e => !app || e.app === app);
     let scored = pool.map(e => ({e, ...score(e, toks)}));
     let hits = scored.filter(x => x.all && x.total > 0);
@@ -645,9 +689,8 @@ function results(){
     list = ENTRIES.filter(e => !app || e.app === app);
     title = app ? APPS[app].name + ": everything" : "Everything";
   }
-  return {list, title, app, grouped: !toks.length || !!(state.pick && !state.q)};
+  return {list, title, app, grouped: !toks.length};
 }
-
 function row(e, showApp){
   return '<button type="button" class="row' + (state.active === e.id ? " on" : "") + '" data-id="' + e.id + '" style="--sc:' + ACC[e.app] + '">' +
     (showApp ? '<span class="app">' + (state.app === e.app ? "" : esc(APPS[e.app].name) + " · ") + esc(e.s) + "</span>" : "") +
@@ -658,49 +701,48 @@ function row(e, showApp){
 function panel(title, sub, color, inner){
   return '<section class="frame sec" style="--sc:' + color + '"><i class="c1"></i><i class="c2"></i><div class="sec-h"><h3>' + esc(title) + "</h3><span>" + esc(sub) + '</span></div><div class="rows">' + inner + "</div></section>";
 }
-
 function render(){
   const {list, title, app, grouped} = results();
   $("rtitle").textContent = title;
-  $("count").innerHTML = list.length + (list.length === 1 ? " ANSWER" : " ANSWERS") + ((state.q || state.pick) ? '<button type="button" class="clear" id="reset">Show all</button>' : "");
+  $("count").innerHTML = list.length + (list.length === 1 ? " ANSWER" : " ANSWERS") + (state.q ? '<button type="button" class="clear" id="reset">Show all</button>' : "");
   let h = "";
-  if (!list.length){
-    h = '<div class="empty-state">Nothing matches. Try fewer words, or a knob or key name such as REC, LEN or SPRD.</div>';
-  } else if (grouped){
-    const apps = app ? [app] : ORDER;
-    apps.forEach(a => {
+  if (!list.length) h = '<div class="empty-state">Nothing matches. Try fewer words, or a knob or key name such as REC, LEN or SPRD.</div>';
+  else if (grouped){
+    (app ? [app] : ORDER).forEach(a => {
       const mine = list.filter(e => e.app === a);
       [...new Set(mine.map(e => e.s))].forEach(s => {
         const items = mine.filter(e => e.s === s);
         h += panel((app ? "" : APPS[a].name + " · ") + s, items.length + (items.length === 1 ? " move" : " moves"), ACC[a], items.map(e => row(e, false)).join(""));
       });
     });
-  } else {
-    h = panel("Best matches", list.length + " found", app ? ACC[app] : "var(--amber)", list.map(e => row(e, true)).join(""));
-  }
+  } else h = panel("Best matches", list.length + " found", app ? ACC[app] : "var(--amber)", list.map(e => row(e, true)).join(""));
   $("results").innerHTML = h;
-  const rs = $("reset"); if (rs) rs.onclick = () => { state.q = ""; $("q").value = ""; state.pick = null; state.active = null; renderAll(); };
+  const rs = $("reset"); if (rs) rs.onclick = () => { state.q = ""; $("q").value = ""; state.active = null; renderAll(); };
 }
-
+function drawBoard(){ drawGrid(); drawE16(); drawInsp(); }
 function renderAll(){
   const a = state.app;
   $("chips").innerHTML = [["", "All apps"], ...ORDER.map(k => [k, APPS[k].name])].map(([k,n]) => '<button type="button" data-app="' + k + '" aria-pressed="' + ((state.app || "") === k) + '" style="--c:' + (k ? ACC[k] : "var(--amber)") + '">' + esc(n) + "</button>").join("");
   $("boardwrap").hidden = !a;
-  document.body.classList.toggle("has-app", !!a);
-  document.body.classList.toggle("all", !a);
-  document.body.classList.toggle("searching", !!state.q.trim() || !!state.pick);
   document.documentElement.style.setProperty("--acc", a ? ACC[a] : "var(--amber)");
   if (a){ $("note").textContent = APPS[a].note; $("appcode").textContent = CODE[a]; }
   $("src").textContent = a ? APPS[a].src : ORDER.map(k => APPS[k].src).join(" ");
-  if (a){ if (!E16[a][state.layer]) state.layer = Object.keys(E16[a])[0]; drawGrid(); drawE16(); drawCap(); }
+  if (a){ if (!E16[a][state.layer]) state.layer = Object.keys(E16[a])[0]; drawBoard(); }
   render();
 }
-
 function setApp(a){
   state.app = a || null; state.active = null; state.pick = null; state.layer = a ? Object.keys(E16[a])[0] : null;
   try { history.replaceState(null, "", a ? "#" + a : location.pathname); } catch (err) {}
   try { localStorage.setItem("norns-manual-app", a || ""); } catch (err) {}
   renderAll();
+}
+function choose(e, scroll){
+  if (state.app !== e.app){ state.app = e.app; state.pick = null; try { history.replaceState(null, "", "#" + e.app); } catch (err) {} }
+  state.active = state.active === e.id ? null : e.id;
+  const layers = Object.keys(E16[e.app]);
+  state.layer = e.layer && E16[e.app][e.layer] ? e.layer : (state.layer && E16[e.app][state.layer] && !e.layer ? state.layer : layers[0]);
+  renderAll();
+  if (scroll && state.active != null){ const r = $("boardwrap").getBoundingClientRect(); if (r.top < 0 || r.top > innerHeight * .5) $("boardwrap").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); }
 }
 
 /* ---------- events ---------- */
@@ -708,9 +750,9 @@ $("tries").insertAdjacentHTML("beforeend", ["mutated mutes","copy a step","skip 
 $("tries").addEventListener("click", ev => { const b = ev.target.closest("button"); if (!b) return; $("q").value = b.textContent; onSearch(); $("q").focus(); });
 let timer;
 function onSearch(){
-  state.q = $("q").value; state.pick = null; state.active = null;
+  state.q = $("q").value; state.active = null;
   const {app} = parse(state.q);
-  if (app && app !== state.app){ state.app = app; state.layer = Object.keys(E16[app])[0]; try { history.replaceState(null, "", "#" + app); } catch (err) {} }
+  if (app && app !== state.app){ state.app = app; state.pick = null; state.layer = Object.keys(E16[app])[0]; try { history.replaceState(null, "", "#" + app); } catch (err) {} }
   renderAll();
 }
 $("q").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(onSearch, 120); });
@@ -720,29 +762,21 @@ $("layers").addEventListener("click", ev => { const b = ev.target.closest("butto
 $("grid").addEventListener("click", ev => {
   const b = ev.target.closest("button.key"); if (!b) return;
   const r = +b.dataset.r, c = +b.dataset.c, k = APPS[state.app].grid()[r-1][c-1];
-  const same = state.pick && state.pick.type === "key" && state.pick.r === r && state.pick.c === c;
-  state.active = null; state.q = ""; $("q").value = "";
-  state.pick = same ? null : {type:"key", r, c, title:"row " + r + ", key " + c + (k.t ? " (" + k.t + ")" : ""), info:k.i || ""};
-  drawGrid(); drawE16(); drawCap(); render();
+  const same = state.pick && state.pick.type === "key" && state.pick.r === r && state.pick.c === c && state.active == null;
+  state.active = null;
+  state.pick = same ? null : {type:"key", r, c, title:"Row " + r + " key " + c + (k.t ? " (" + k.t + ")" : ""), info:k.i || ""};
+  drawBoard();
 });
 $("e16").addEventListener("click", ev => {
   const b = ev.target.closest("button.knob"); if (!b) return;
   const n = +b.dataset.n, k = E16[state.app][state.layer][n-1], base = E16[state.app][Object.keys(E16[state.app])[0]][n-1];
-  const same = state.pick && state.pick.type === "knob" && state.pick.n === n && state.pick.layer === state.layer;
-  state.active = null; state.q = ""; $("q").value = "";
-  state.pick = same ? null : {type:"knob", n, layer:state.layer, title:"knob " + n + " (" + k[0] + ")", info:(k[2] || base[2] || k[1])};
-  drawGrid(); drawE16(); drawCap(); render();
+  const same = state.pick && state.pick.type === "knob" && state.pick.n === n && state.pick.layer === state.layer && state.active == null;
+  state.active = null;
+  state.pick = same ? null : {type:"knob", n, layer:state.layer, title:"Knob " + n + " (" + k[0] + ")", info:(k[2] || base[2] || k[1])};
+  drawBoard();
 });
-$("results").addEventListener("click", ev => {
-  const b = ev.target.closest(".row"); if (!b) return;
-  const e = ENTRIES[+b.dataset.id];
-  if (state.app !== e.app){ state.app = e.app; try { history.replaceState(null, "", "#" + e.app); } catch (err) {} }
-  state.active = state.active === e.id ? null : e.id;
-  const layers = Object.keys(E16[e.app]);
-  state.layer = e.layer && E16[e.app][e.layer] ? e.layer : (state.layer && E16[e.app][state.layer] && !e.layer ? state.layer : layers[0]);
-  renderAll();
-  if (state.active != null && innerWidth < 1000) $("boardwrap").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
-});
+$("insp").addEventListener("click", ev => { const b = ev.target.closest(".mv"); if (!b) return; const e = ENTRIES[+b.dataset.id]; state.active = state.active === e.id ? null : e.id; if (e.layer && E16[e.app][e.layer]) state.layer = e.layer; drawBoard(); render(); });
+$("results").addEventListener("click", ev => { const b = ev.target.closest(".row"); if (!b) return; state.pick = null; choose(ENTRIES[+b.dataset.id], true); });
 document.addEventListener("keydown", ev => { if (ev.key === "/" && document.activeElement !== $("q")){ ev.preventDefault(); $("q").focus(); } });
 function fromHash(){ const h = location.hash.replace("#",""); return APPS[h] ? h : null; }
 window.addEventListener("hashchange", () => { const h = fromHash(); if (h !== state.app) setApp(h); });
