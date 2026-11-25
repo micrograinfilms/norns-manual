@@ -53,39 +53,51 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .frame>.c2{bottom:-1px;right:-1px;border-bottom:2px solid var(--fc,var(--amber));border-right:2px solid var(--fc,var(--amber))}
 .boardcol{display:flex;flex-direction:column;gap:10px}
 .board{padding:12px;--fc:var(--acc)}
-.board-in{display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-start}
-.gridwrap{container-type:inline-size;flex:2 1 560px;max-width:1120px}
-.e16col{flex:0 0 auto;display:flex;flex-direction:column;gap:8px;width:204px}
-.insp{flex:1 1 320px;display:flex;flex-direction:column;gap:10px;min-height:200px}
-@media(max-width:999px){.gridwrap{flex-basis:100%;max-width:none}}
+.board-in{container-type:inline-size;display:flex;flex-wrap:wrap;gap:16px 2.2%;align-items:flex-start;--k:min(84px,calc((100cqw - 26px) / 17.5));--kn:clamp(44px,calc(var(--k)*1.15),64px)}
+@container (min-width:900px){.gridwrap,.e16col{--k:min(84px,calc((100cqw - 90px) / 21.6));--kn:calc(var(--k)*.92)}}
+.gridwrap{flex:0 0 auto;position:relative;padding-bottom:calc(var(--k)*.55)}
+.e16col{flex:0 0 auto;display:flex;flex-direction:column;gap:8px;width:calc(var(--kn)*4 + 24px)}
+
+
 .key{position:relative}
-.gl{position:absolute;top:1px;right:2px;font:700 calc(var(--k)*.17)/1 var(--fm);color:var(--cream);opacity:.9;letter-spacing:-.02em;pointer-events:none}
-@container (max-width:470px){.gl{font-size:0;width:4px;height:4px;border-radius:50%;background:var(--cream);top:2px;right:2px;box-shadow:0 0 3px var(--cream)}}
+.gl{position:absolute;top:2px;right:2px;font:700 max(9px,calc(var(--k)*.19))/1 var(--fm);color:var(--cream);background:rgba(10,9,8,.55);padding:1px 3px;letter-spacing:.02em;pointer-events:none;white-space:nowrap}
+.key .t{margin-top:calc(var(--k)*.12)}
+.pair{position:absolute;border:2px solid var(--cream);border-top:0;pointer-events:none;opacity:.85}
+.pair span{position:absolute;left:50%;top:100%;transform:translate(-50%,2px);font:700 max(9px,calc(var(--k)*.16))/1 var(--fm);color:var(--cream);letter-spacing:.08em;white-space:nowrap;background:var(--card);padding:1px 4px}
+@container (max-width:470px){.gl{font-size:0;width:5px;height:5px;padding:0;border-radius:50%;background:var(--cream);top:2px;right:2px;box-shadow:0 0 3px var(--cream)}.key .t{margin-top:0}.pair span{font-size:7px}}
 .key.partner{outline:2px solid var(--acc);outline-offset:1px;box-shadow:0 0 10px var(--acc)}
 .key.zone{outline:1px dashed var(--acc);outline-offset:1px}
-.ih{font-size:9.5px;letter-spacing:.14em;color:var(--amberd);text-transform:uppercase}
+.info{margin-top:14px;border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.moves{list-style:none;margin:0;padding:0;columns:2 420px;column-gap:28px}
+.moves li{break-inside:avoid}
+.moves button{display:flex;gap:8px;width:100%;text-align:left;background:none;border:0;border-left:2px solid transparent;padding:5px 8px;cursor:pointer;color:var(--cream);font-size:12.5px;line-height:1.45}
+.moves button::before{content:"▸";color:var(--acc);flex:none}
+.moves button:hover{background:rgba(255,255,255,.03)}
+.moves button.on{border-left-color:var(--acc);background:color-mix(in srgb,var(--acc) 8%,transparent)}
+.moves b{color:var(--acc)}
+.ih{font-size:10px;letter-spacing:.14em;color:var(--amberd);text-transform:uppercase}
 .it{font-weight:700;font-size:13px;color:var(--acc)}
-.ii{font-size:11.5px;color:var(--dim);line-height:1.5}
+.ii{font-size:12px;color:var(--dim);line-height:1.5}
 .det{border-left:2px solid var(--acc);padding:4px 0 4px 10px;background:color-mix(in srgb,var(--acc) 6%,transparent)}
 .det .how{font-size:12px;color:var(--cream);margin-top:2px}.det p{margin:4px 0 0;font-size:11.5px;color:var(--dim);line-height:1.5}
-.mvs{display:flex;flex-direction:column;gap:6px}
-.mv{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);padding:6px;cursor:pointer;color:inherit}
-.mv:hover{border-color:var(--amberd)}.mv.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 8%,var(--card2))}
-.mv .mt{font-weight:700;font-size:11.5px;color:var(--acc);display:block}.mv .mh{font-size:11px;color:var(--cream);display:block;line-height:1.4}
-.mg{display:grid;grid-template-columns:repeat(16,8px);grid-template-rows:repeat(8,8px);gap:1px;flex:none}
-.mg i{border-radius:1px;font:700 7px/8px var(--fm);font-style:normal;text-align:center;color:#0A0908}
-.mg i.hold{background:var(--amber)!important;box-shadow:0 0 4px var(--amber)}.mg i.press{background:var(--cream)!important;box-shadow:0 0 4px var(--cream)}
-.mk{font:700 9px var(--fm);color:var(--cream);border:1px solid var(--line);padding:1px 4px;flex:none;align-self:center}
+
+
+
+
+
+
+
+
 .cap-h{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.14em;color:var(--amberd);margin-bottom:8px;text-transform:uppercase}
 .note{font-size:11px;color:var(--dim);margin:0 0 10px;line-height:1.5}
-.grid{--k:calc((100cqw - 26px) / 17.5);display:grid;grid-template-columns:10px repeat(16,var(--k));grid-template-rows:10px repeat(8,var(--k));gap:calc(var(--k)*.1)}
+.grid{display:grid;grid-template-columns:10px repeat(16,var(--k));grid-template-rows:10px repeat(8,var(--k));gap:calc(var(--k)*.1)}
 .num{font-size:8px;color:#5c5240;display:flex;align-items:center;justify-content:center}
 .key{border:1px solid var(--line);background:var(--card2);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0;overflow:hidden;cursor:pointer;color:var(--cream);border-radius:0}
 .key:hover{filter:brightness(1.35)}
 .key.dark{background:transparent;border:1px dashed #241C12;cursor:default}
 .key .t{font:700 calc(var(--k)*.22)/1.05 var(--fm)}
 .key .s{font:400 calc(var(--k)*.17)/1.05 var(--fm);opacity:.75;margin-top:1px}
-@container (max-width:560px){.key .s{display:none}}
+@container (max-width:620px){.key .s{display:none}}
 .key.hold{background:var(--amber)!important;border-color:var(--amber)!important;color:#0A0908!important;box-shadow:0 0 8px var(--amber)}
 .key.press{background:var(--cream)!important;border-color:var(--cream)!important;color:#0A0908!important;box-shadow:0 0 8px var(--cream)}
 .key.picked{outline:2px solid var(--acc);outline-offset:1px}
@@ -95,9 +107,9 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .layers{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
 .layers button{font-size:9.5px;letter-spacing:.06em;padding:3px 7px;background:none;border:1px solid var(--line);color:var(--dim);cursor:pointer;text-transform:uppercase}
 .layers button[aria-pressed=true]{border-color:var(--ring);color:var(--ring)}
-.e16{display:grid;grid-template-columns:repeat(4,46px);gap:5px}
-.knob{width:46px;height:46px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card2);border:1px solid var(--ring,var(--line));text-align:center;padding:2px;cursor:pointer;color:var(--cream)}
-.knob .t{font:700 9.5px/1.1 var(--fm)}.knob .s{font-size:7px;line-height:1.1;color:var(--dim)}
+.e16{display:grid;grid-template-columns:repeat(4,var(--kn));gap:8px}
+.knob{width:var(--kn);height:var(--kn);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card2);border:1px solid var(--ring,var(--line));text-align:center;padding:2px;cursor:pointer;color:var(--cream)}
+.knob .t{font:700 max(9.5px,calc(var(--kn)*.2))/1.1 var(--fm)}.knob .s{font-size:max(7px,calc(var(--kn)*.13));line-height:1.1;color:var(--dim)}
 .knob.empty{opacity:.25;cursor:default;border-style:dashed}
 .knob.hl{background:var(--cream);border-color:var(--cream);color:#0A0908;box-shadow:0 0 8px var(--cream)}.knob.hl .s{color:#3A2E1E}
 .knob.picked{outline:2px solid var(--acc);outline-offset:1px}
@@ -107,7 +119,7 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .cap b{color:var(--acc);font-size:12.5px}.cap .how{color:var(--cream);margin-top:2px}.cap p{margin:4px 0 0;color:var(--dim)}
 .cap.empty{color:var(--dim)}
 .enote{font-size:10.5px;color:var(--dim);line-height:1.45}
-.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:10px;color:var(--dim);border-top:1px solid var(--line);padding-top:8px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11px;color:var(--dim);border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
 .legend b{color:var(--cream);margin-right:4px}
 .legend i{display:inline-flex;width:13px;height:13px;vertical-align:-2px;margin-right:5px;align-items:center;justify-content:center;font:700 8px var(--fm);font-style:normal;color:#0A0908}
 /* answers */
@@ -164,8 +176,8 @@ mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:inherit;pa
         <div class="board-in">
           <div class="gridwrap"><div class="grid" id="grid"></div></div>
           <div class="e16col"><div class="layers" id="layers"></div><div class="e16" id="e16"></div><div class="enote" id="enote"></div></div>
-          <div class="insp" id="insp"></div>
         </div>
+        <div class="info" id="insp"></div>
       </div>
     </div>
     <div class="anscol">
@@ -631,6 +643,7 @@ function drawGrid(){
     }
   }
   $("grid").innerHTML = h;
+  drawPairs();
 }
 function drawE16(){
   const a = state.app, layers = Object.keys(E16[a]), e = state.active != null ? ENTRIES[state.active] : null;
@@ -645,30 +658,37 @@ function drawE16(){
   }).join("");
   $("enote").textContent = KNOBNOTE[a];
 }
-function miniGrid(e){
-  const g = APPS[e.app].grid(), m = marks(e);
-  let h = '<span class="mg" aria-hidden="true">';
-  for (let r = 1; r <= 8; r++) for (let c = 1; c <= 16; c++){
-    const k = g[r-1][c-1], mk = m[r+","+c];
-    h += '<i class="' + (mk ? mk[0] : "") + '" style="background:' + (k ? "color-mix(in srgb, " + G(k.grp) + " 16%, #16130F)" : "#0A0908") + '">' + (mk ? (mk[1] === "2x" ? "2" : mk[1]) : "") + "</i>";
-  }
-  return h + "</span>";
-}
-const LEGEND = '<div class="legend"><span><b>2×</b>double tap</span><span><b>H</b>hold with another key</span><span><b>+</b>press while holding another</span><span><b>&amp;</b>press together</span>' +
+const LEGEND = '<div class="legend"><span><b>2×</b> double tap</span><span><b>H</b> hold while pressing another key</span><span><b>+</b> press while holding another key</span><span><b>&amp;</b> press together</span><span>bracket: two keys used together</span>' +
   '<span><i style="background:var(--amber)">H</i>hold</span><span><i style="background:var(--cream)">1</i>press in order</span><span><i style="background:var(--cream);border-radius:50%">↻</i>turn</span><span><i style="background:var(--cream);border-radius:50%">●</i>push</span></div>';
 function drawInsp(){
   const e = state.active != null ? ENTRIES[state.active] : null, p = state.pick;
   let h = "";
-  if (e) h += '<div class="det">' + (e.badge ? '<span class="badge" style="margin-left:0">' + esc(e.badge) + "</span><br>" : "") + '<span class="it">' + esc(e.t) + '</span><div class="how">' + esc(e.how) + (e.norns ? '<span class="chip">' + esc(e.norns) + "</span>" : "") + "</div>" + (e.d ? "<p>" + esc(e.d) + "</p>" : "") + "</div>";
   if (p){
     const list = pickMoves();
     h += '<div><div class="ih">' + esc(p.title) + " · " + list.length + (list.length === 1 ? " move" : " moves") + '</div>' + (p.info ? '<div class="ii">' + esc(p.info) + "</div>" : "") + "</div>";
-    h += '<div class="mvs">' + list.map(x => '<button type="button" class="mv' + (state.active === x.id ? " on" : "") + '" data-id="' + x.id + '">' +
-      ((x.hold || x.press) ? miniGrid(x) + (x.knob ? '<span class="mk">' + (x.knob[1] === "turn" ? "↻" : "●") + " K" + x.knob[0] + "</span>" : "") : '<span class="mk">' + (x.knob ? (x.knob[1] === "turn" ? "↻" : "●") + " K" + x.knob[0] : "norns") + "</span>") +
-      '<span><span class="mt">' + esc(x.t) + (x.badge ? '<span class="badge">' + esc(x.badge) + "</span>" : "") + '</span><span class="mh">' + esc(x.how) + "</span></span></button>").join("") + "</div>";
+    h += '<ul class="moves">' + list.map(x => '<li><button type="button" class="' + (state.active === x.id ? "on" : "") + '" data-id="' + x.id + '"><span><b>' + esc(x.t) + "</b>" + (x.badge ? " (" + esc(x.badge) + ")" : "") + ": " + esc(x.how) + "</span></button></li>").join("") + "</ul>";
   }
-  if (!e && !p) h += '<div class="ii">Tap any key or knob to see every move it is part of, drawn on a small grid. Tap a move to light it on the big board. Marks in the corner of a key show what it combines with.</div>';
+  if (e && !(p && pickMoves().includes(e))) h += '<div class="det">' + (e.badge ? '<span class="badge" style="margin-left:0">' + esc(e.badge) + "</span><br>" : "") + '<span class="it">' + esc(e.t) + '</span><div class="how">' + esc(e.how) + (e.norns ? '<span class="chip">' + esc(e.norns) + "</span>" : "") + "</div>" + (e.d ? "<p>" + esc(e.d) + "</p>" : "") + "</div>";
+  if (e && p && pickMoves().includes(e) && e.d) h += '<div class="ii">' + esc(e.d) + "</div>";
+  if (!e && !p) h += '<div class="ii">Tap any key or knob to list everything it does. Marks in a key\'s corner show how it combines with other keys.</div>';
   $("insp").innerHTML = h + LEGEND;
+}
+
+/* brackets under pairs of fixed keys used together, such as DUB and SPD */
+const PAIRNAME = {mutated:{"8,1|8,2":"SLOTS","8,9|8,10":"CYCLE MODE","8,12|8,13":"COPY"}, cb:{"6,13|6,14":"CLEAR"}, fractured:{"6,14|6,15":"CLEAR"}, still:{"8,9|8,10":"CLEAR"}};
+function drawPairs(){
+  const a = state.app, wrap = $("grid").parentElement;
+  wrap.querySelectorAll(".pair").forEach(n => n.remove());
+  Object.entries(PAIRNAME[a] || {}).forEach(([key, name]) => {
+    const [p1, p2] = key.split("|"), k1 = $("grid").querySelector('[data-r="' + p1.split(",")[0] + '"][data-c="' + p1.split(",")[1] + '"]'), k2 = $("grid").querySelector('[data-r="' + p2.split(",")[0] + '"][data-c="' + p2.split(",")[1] + '"]');
+    if (!k1 || !k2) return;
+    const x1 = k1.offsetLeft + k1.offsetWidth / 2, x2 = k2.offsetLeft + k2.offsetWidth / 2, y = k1.offsetTop + k1.offsetHeight + 3;
+    const d = document.createElement("div");
+    d.className = "pair";
+    d.style.cssText = "left:" + x1 + "px;width:" + (x2 - x1) + "px;top:" + y + "px;height:" + Math.round(k1.offsetHeight * .2) + "px";
+    d.innerHTML = "<span>" + esc(name) + "</span>";
+    wrap.appendChild(d);
+  });
 }
 
 function results(){
@@ -776,7 +796,7 @@ $("e16").addEventListener("click", ev => {
   state.pick = same ? null : {type:"knob", n, layer:state.layer, title:"Knob " + n + " (" + k[0] + ")", info:(k[2] || base[2] || k[1])};
   drawBoard();
 });
-$("insp").addEventListener("click", ev => { const b = ev.target.closest(".mv"); if (!b) return; const e = ENTRIES[+b.dataset.id]; state.active = state.active === e.id ? null : e.id; if (e.layer && E16[e.app][e.layer]) state.layer = e.layer; drawBoard(); render(); });
+$("insp").addEventListener("click", ev => { const b = ev.target.closest(".moves button"); if (!b) return; const e = ENTRIES[+b.dataset.id]; state.active = state.active === e.id ? null : e.id; if (e.layer && E16[e.app][e.layer]) state.layer = e.layer; drawBoard(); render(); });
 $("results").addEventListener("click", ev => { const b = ev.target.closest(".row"); if (!b) return; state.pick = null; choose(ENTRIES[+b.dataset.id], true); });
 document.addEventListener("keydown", ev => { if (ev.key === "/" && document.activeElement !== $("q")){ ev.preventDefault(); $("q").focus(); } });
 function fromHash(){ const h = location.hash.replace("#",""); return APPS[h] ? h : null; }
@@ -787,6 +807,7 @@ if (!start){ try { const s = localStorage.getItem("norns-manual-app"); if (APPS[
 state.app = start; state.layer = start ? Object.keys(E16[start])[0] : null;
 const setTop = () => document.documentElement.style.setProperty("--bartop", ($("bar").offsetHeight + 12) + "px");
 new ResizeObserver(setTop).observe($("bar"));
+new ResizeObserver(() => { if (state.app) drawPairs(); }).observe($("boardwrap"));
 renderAll();
 }
 </script>
