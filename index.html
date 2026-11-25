@@ -206,14 +206,13 @@ function cbGrid(){
   for (let r = 1; r <= 4; r++){
     P(g,r,1,"L"+r,"loop","play",.9,"Loop " + r + "'s loop key, where its cables start. Double tap to switch between continuous and triggered.");
     boxes.forEach((b,i) => P(g,r,i+2,b[0],"","fx",.85, b[0] === "OUT" ? "Out for strip " + r + ": only what reaches Out is heard." : "The " + b[1] + " box of strip " + r + ". Hold a key and tap another to plug a cable. Double tap to feed it into itself."));
-    P(g,r,9,"CLR","x2","danger",.85,"Press twice within three seconds to unplug every cable touching strip " + r + ".");
     for (let c = 11; c <= 14; c++) P(g,r,c,"PAT",String((r-1)*4+c-10),"pattern",.85,"Pattern " + ((r-1)*4+c-10) + ". Press empty to arm, press again to loop it.");
     P(g,r,16,"PLAY","L"+r,"play",.9,"Play loop " + r + ". Continuous: press to start or stop. Triggered: plays while held.");
   }
   const pitches = ["-2 oct","-1 oct 5th","-1 oct","-5th","orig","+5th","+1 oct","+1 oct 5th","+2 oct"];
   for (let r = 5; r <= 8; r++) pitches.forEach((p,i) => P(g,r,i+1,i===4?"L"+(r-4):"",p,"key",i===4?.95:.6,"Transpose loop " + (r-4) + " to " + p + "."));
-  P(g,6,13,"DUB","","rec",.85,"Hold and press a playing pattern to record more into it. With SPD: clear a pattern.");
-  P(g,6,14,"SPD","speed","rec",.85,"Hold and press a pattern to step its speed. With DUB: clear a pattern.");
+  P(g,6,13,"DUB","","rec",.85,"Hold and press a playing pattern to record more into it. With SPD: press a pattern to clear it, or any key of a strip to unplug the strip.");
+  P(g,6,14,"SPD","speed","rec",.85,"Hold and press a pattern to step its speed. With DUB: press a pattern to clear it, or any key of a strip to unplug the strip.");
   ["network","loop","env","files"].forEach((p,i) => P(g,8,11+i,"PG"+(i+1),p,"nav",.85,"Screen page " + (i+1) + ": " + p + "."));
   P(g,8,16,"PANIC","drain","danger",.85,"Drains every box to silence for two and a half seconds. Cables stay plugged in.");
   return g;
@@ -385,7 +384,7 @@ cb: [
  ["Patching","Plug or unplug a cable","Hold the key where it starts, tap the key where it lands.","Doing it again unplugs it. New cables start at 90 percent. A loop only sends and Out only receives.",{hold:[[1,1]],press:[[1,3]],tags:"cable patch connect plug unplug"}],
  ["Patching","Run a cable to another strip","Hold a key in one row, tap a key in another row.","For example, hold loop 2's key and tap the delay in row 1: loop 2 plays through strip 1's delay.",{hold:[[2,1]],press:[[1,3]],tags:"cable cross strip"}],
  ["Patching","Feed a box into itself","Double tap the box.","Double tap again to unplug it.",{press:[[1,3],[1,3]],same:true,x2:true,tags:"feedback self cable"}],
- ["Patching","Unplug a whole strip","Press CLR, then again within three seconds.","Every cable touching the strip is unplugged, including cables to other strips. Without the second press, nothing happens.",{press:[[1,9],[1,9]],same:true,x2:true,tags:"clear unplug reset delete cables"}],
+ ["Patching","Unplug a whole strip","Hold DUB and SPD, press any key of the strip: its loop key, a box, OUT or PLAY.","Every cable touching the strip is unplugged at once, including cables to other strips. The key you press does nothing else: no cable is plugged and no loop starts or stops. Keep holding both to clear several strips.",{hold:[[6,13],[6,14]],press:[[1,5]],tags:"clear unplug reset delete cables strip clr"}],
  ["Patching","Set a cable's level","Hold its start key and landing key, turn CABL (knob 2).","Letting go after turning only sets the level.",{hold:[[1,1],[1,3]],knob:[2,"turn"],tags:"cable level volume"}],
  ["Patching","Set a box's self cable level","Hold just that box, turn CABL.","",{hold:[[1,3]],knob:[2,"turn"],tags:"feedback level cable"}],
  ["Patching","Read what's plugged in","Hold any key.","It shows full brightness, the keys it sends to light up (brighter for louder cables), everything else dims. Boxes in a feedback circle are brighter.",{hold:[[1,4]],tags:"view cables see"}],
@@ -400,7 +399,7 @@ cb: [
  ["Patterns","Stop or play a pattern","Press it.","Stopping a pattern also stops a triggered loop it was playing.",{press:[[1,11]],tags:"pattern stop play"}],
  ["Patterns","Overdub a pattern","Hold DUB, press a playing pattern.","Press the pattern again to finish.",{hold:[[6,13]],press:[[1,12]],tags:"overdub dub add"}],
  ["Patterns","Change a pattern's speed","Hold SPD, press the pattern.","Steps through normal, half, quarter and double.",{hold:[[6,14]],press:[[1,12]],tags:"speed half double"}],
- ["Patterns","Clear a pattern","Hold DUB, then SPD too, press the pattern.","It empties at once and silently. Keep holding both to clear several.",{hold:[[6,13],[6,14]],press:[[1,12]],tags:"clear delete erase pattern"}],
+ ["Patterns","Clear a pattern","Hold DUB, then SPD too, press the pattern.","It empties at once and silently. Keep holding both to clear several. The same chord on a strip key unplugs that strip.",{hold:[[6,13],[6,14]],press:[[1,12]],tags:"clear delete erase pattern"}],
  ["Patterns","What a pattern changes","Nothing to press.","A pattern only owns what it changes: each pass, its cables and settings go back to where they were when it first touched them. Everything else is yours, so you can rewire while it plays. Knobs a playing pattern moves show red on the E16.",{tags:"explain pattern"}],
  ["Slot effect","Change a strip's slot effect","Press PG1, tap any key in the strip's row once, turn norns E2.","Freezer, stutter, shimmer or resonator. Cables and settings stay and it can change while playing. Tap only once: a double tap feeds a box into itself.",{press:[[8,11],[2,7]],norns:"E2",tags:"slot effect freezer stutter shimmer resonator"}],
  ["Slot effect","Set the resonator's key","On the network page, turn norns E3.","",{badge:"resonator in the slot",norns:"E3",tags:"resonator key root"}],
@@ -493,7 +492,7 @@ still: [
 
 const APPS = {
   mutated:{name:"Mutated",grid:mutatedGrid,note:"Rows 1 to 6 are the tracks on the current page: T1 to T6 on page C, T7 to T12 on page T. Row 7 is the cycle row. Keys 4 to 7 on the bottom row are step pages.",src:"From the Mutated README and code, Nov 25, 2026 (includes mutes and whole page changes)."},
-  cb:{name:"Circuit Breaker",grid:cbGrid,note:"Rows 1 to 4 are the strips of loops 1 to 4, each laid out the same way. Rows 5 to 8 transpose loops 1 to 4.",src:"From the Circuit Breaker README, Nov 25, 2026."},
+  cb:{name:"Circuit Breaker",grid:cbGrid,note:"Rows 1 to 4 are the strips of loops 1 to 4, each laid out the same way and ending at OUT, as on the screen. Rows 5 to 8 transpose loops 1 to 4. Columns 9, 10 and 15 stay dark.",src:"From the Circuit Breaker README, Nov 25, 2026."},
   fractured:{name:"Fractured",grid:frGrid,note:"Column 1 is velocity, columns 2 to 8 the in key keyboard. Patterns and pages sit where they do in Circuit Breaker.",src:"From the Fractured README, Nov 24, 2026 (RIPL renamed TAPE)."},
   still:{name:"Still",grid:stillGrid,note:"Rows 1 to 6 are voices 1 to 6, each key a position in that voice's sound. Row 7 is patterns 1 to 16. On the real grid only each voice's position lights.",src:"From Still's code as of Nov 25, 2026 (spray, LIFT and LOOM included; its README hasn't caught up yet)."}
 };
