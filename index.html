@@ -133,6 +133,26 @@ h1{font:400 14px/1.3 "Press Start 2P",var(--fm);color:var(--amber);margin:0;whit
 .legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11px;color:var(--dim);border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
 .legend b{color:var(--cream);margin-right:4px}
 .legend i{display:inline-flex;width:13px;height:13px;vertical-align:-2px;margin-right:5px;align-items:center;justify-content:center;font:700 8px var(--fm);font-style:normal;color:#0A0908}
+/* view toggle and cheat sheet */
+.views{display:flex;border:1px solid var(--amberd)}
+.views button{font-size:11px;letter-spacing:.08em;padding:6px 10px;background:none;border:0;color:var(--dim);cursor:pointer;text-transform:uppercase}
+.views button+button{border-left:1px solid var(--amberd)}
+.views button[aria-pressed=true]{background:var(--amber);color:#0A0908;font-weight:700}
+.sheet{columns:3 400px;column-gap:16px}
+.sheet>.frame{break-inside:avoid;margin-bottom:14px}
+.sheet-app{grid-column:1/-1;margin:6px 0 10px;font:400 12px/1.3 "Press Start 2P",var(--fm);color:var(--sc)}
+.cs{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:4px 12px;align-items:baseline;width:100%;text-align:left;background:none;border:0;border-bottom:1px dashed var(--line);padding:6px 8px;cursor:pointer;color:inherit}
+.cs:last-child{border-bottom:0}
+.cs:hover{background:rgba(255,255,255,.03)}
+.combo{display:flex;flex-wrap:wrap;gap:3px;align-items:center;font-size:11px;color:var(--dim)}
+.kc{display:inline-block;font:700 11px/1.35 var(--fm);padding:0 5px;border:1px solid var(--line);color:var(--cream);background:var(--card2);white-space:nowrap}
+.kc.h{border-color:var(--amber);color:var(--amber)}
+.kc.n{border-color:var(--cyan);color:var(--cyan)}
+.kc.k{border-color:var(--cream);border-radius:9px}
+.kc.r{border-color:var(--red);color:var(--red);border-radius:9px}
+.eff{font-size:12px;color:var(--cream);line-height:1.4}.eff i{font-style:normal;color:var(--dim);font-size:10.5px}
+.sheet-key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:var(--dim);margin:0 0 12px}
+@media(max-width:600px){.cs{grid-template-columns:minmax(0,1fr)}}
 /* answers */
 .head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .lbl{font-size:10px;letter-spacing:.24em;color:var(--amberd);text-transform:uppercase;margin:0}
@@ -175,11 +195,17 @@ mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:inherit;pa
     <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="search: mutated mutes" aria-label="Search the manual">
     <button id="qx" type="button" aria-label="Clear search">×</button>
   </div>
+  <div class="views" id="views" role="group" aria-label="View"><button type="button" data-v="sheet">Cheat sheet</button><button type="button" data-v="board">Full manual</button></div>
   <div class="chips" id="chips" role="group" aria-label="App"></div>
   <div class="tries" id="tries"><span>TRY</span></div>
 </div></div>
 <div class="page">
   <div class="main">
+    <div id="sheetwrap" hidden>
+      <div class="head"><p class="lbl" id="stitle">Cheat sheet</p><span class="count" id="scount"></span></div>
+      <div class="sheet-key"><span><span class="kc h">DUB</span> hold</span><span><span class="kc">PAT</span> press</span><span>→ while holding, press</span><span><span class="kc">2× L1</span> double tap</span><span><span class="kc k">↻ FILT</span> turn knob</span><span><span class="kc k">● RVER</span> push knob</span><span><span class="kc n">K2</span> norns key or encoder</span><span>Tap a line to see it lit on the board.</span></div>
+      <div class="sheet" id="sheet"></div>
+    </div>
     <div class="boardcol" id="boardwrap" hidden>
       <div class="frame board"><i class="c1"></i><i class="c2"></i>
         <div class="cap-h"><span>GRID_128 / OXI_E16</span><span id="appcode"></span></div>
@@ -191,7 +217,7 @@ mark{background:color-mix(in srgb,var(--amber) 28%,transparent);color:inherit;pa
         <div class="info" id="insp"></div>
       </div>
     </div>
-    <div class="anscol">
+    <div class="anscol" id="anscol">
       <div class="head"><p class="lbl" id="rtitle">Everything</p><span class="count" id="count"></span></div>
       <div class="results" id="results"></div>
       <p class="src" id="src"></p>
@@ -758,24 +784,96 @@ function render(){
   const rs = $("reset"); if (rs) rs.onclick = () => { state.q = ""; $("q").value = ""; state.active = null; renderAll(); };
 }
 function drawBoard(){ drawGrid(); drawE16(); drawInsp(); }
+
+/* ---------- cheat sheet: only the combinations and hidden moves ---------- */
+const ZNAME = {track:"step", cycle:"cycle", steppage:"step page", loop:"loop key", box:"box", out:"OUT", clr:"CLR", pat:"pattern", play:"PLAY", pitch:"pitch key", page:"PG",
+  vel:"velocity key", kbd:"note key", fader:"fader key", voice:"voice key", sel:"select key"};
+function keyName(e, k){
+  const z = zone(e.app, k[0], k[1]), g = APPS[e.app].grid()[k[0]-1][k[1]-1];
+  if (e.app === "mutated" && k[0] === 1 && /slot/.test(e.badge || "")) return "slot";
+  if (z === "page" || z === "steppage" || z === "sendsel" || z.startsWith("k")) return g ? (g.t || g.s) : "key";
+  if (e.app === "fractured" && z === "loop") return "LOOP";
+  return ZNAME[z] || (g && g.t) || "key";
+}
+function isCheat(e){
+  if (e.kref) return false;
+  const h = e.hold || [], p = e.press || [];
+  return h.length > 0 || e.x2 || p.length > 1 || (e.knob && e.knob[1] === "push") || (e.norns && /hold|\+|let go|right|K\d/i.test(e.norns));
+}
+function names(e, list){ const out = []; list.forEach(k => { const n = keyName(e, k); if (out[out.length-1] !== n) out.push(n); }); return out; }
+function comboHTML(e){
+  const h = names(e, e.hold || []), p = names(e, e.press || []), parts = [];
+  const chip = (t, c) => '<span class="kc' + (c ? " " + c : "") + '">' + esc(t) + "</span>";
+  if (h.length) parts.push(h.map((n, i) => chip(n + ((e.hold || []).length > h.length && i === h.length - 1 && !/^[A-Z▲▼]/.test(n) ? "s" : ""), "h")).join(" + "));
+  let pr = "";
+  if (p.length){
+    const more = (e.press || []).length > p.length && !e.x2 && !e.same;
+    if (e.x2) pr = chip("2× " + p[0]);
+    else if (e.same) pr = p.map(n => chip(n)).join(" & ");
+    else pr = p.map((n, i) => chip(n + (more && i === p.length - 1 && !/^[A-Z▲▼]/.test(n) ? "s" : ""))).join(" then ");
+    if (more && p.length === 1 && /^[a-z]/.test(p[0]) && (e.press || []).length > 2 && /then/i.test(e.how)) pr = chip(p[0]) + " then " + chip(p[0] + "s");
+  }
+  if (pr) parts.push((h.length ? "→ " : "") + pr);
+  if (e.knob){
+    const layer = e.layer || Object.keys(E16[e.app])[0], kn = E16[e.app][layer][e.knob[0]-1][0];
+    const rec = e.knob[0] === 16 && e.knob[1] === "push" && /tape|record/i.test(e.t);
+    let t;
+    if (rec) t = "● hold knob 16, 1 sec";
+    else if (/changing|change anything/i.test(e.how)) t = "change anything";
+    else if (/knobs\b|any knob/i.test(e.how)) t = e.knob[1] === "turn" ? "↻ any knob" : "● any knob";
+    else if (/that knob/i.test(e.how)) t = "● that knob";
+    else if (e.app === "mutated" && e.knob[0] === 13 && /ROT/.test(e.d + e.t)) t = "↻ ROT (knob 13)";
+    else t = (e.knob[1] === "turn" ? "↻ " : "● ") + kn;
+    parts.push((h.length || pr ? (h.length && !pr ? "→ " : "+ ") : "") + chip(t, rec ? "r" : "k") + (layer !== Object.keys(E16[e.app])[0] && layer !== "Select held" ? ' <i>(' + esc(layer) + ")</i>" : ""));
+  }
+  if (e.norns) parts.push((parts.length ? "+ " : "") + chip(e.norns, "n"));
+  return parts.join(" ");
+}
+function drawSheet(){
+  const apps = state.app ? [state.app] : ORDER;
+  let h = "", count = 0;
+  apps.forEach(a => {
+    const mine = ENTRIES.filter(e => e.app === a && isCheat(e));
+    count += mine.length;
+    if (!state.app) h += '<div class="sheet-app frame sec" style="--sc:' + ACC[a] + ';padding:10px 14px;break-inside:avoid"><i class="c1"></i><i class="c2"></i>' + esc(APPS[a].name.toUpperCase()) + "</div>";
+    [...new Set(mine.map(e => e.s))].forEach(s => {
+      const items = mine.filter(e => e.s === s);
+      h += '<section class="frame sec" style="--sc:' + ACC[a] + '"><i class="c1"></i><i class="c2"></i><div class="sec-h"><h3>' + esc(s) + "</h3><span>" + (state.app ? items.length : esc(APPS[a].name)) + '</span></div><div class="rows">' +
+        items.map(e => '<button type="button" class="cs" data-id="' + e.id + '"><span class="combo">' + comboHTML(e) + '</span><span class="eff">' + esc(e.t) + (e.badge ? " <i>(" + esc(e.badge) + ")</i>" : "") + "</span></button>").join("") + "</div></section>";
+    });
+  });
+  $("sheet").innerHTML = h;
+  $("stitle").textContent = state.app ? APPS[state.app].name + ": cheat sheet" : "Cheat sheets: all apps";
+  $("scount").textContent = count + " COMBOS";
+}
+function setHash(){
+  const h = (state.app || "") + (state.view === "board" ? (state.app ? "-full" : "full") : "");
+  try { history.replaceState(null, "", h ? "#" + h : location.pathname); } catch (err) {}
+  try { localStorage.setItem("norns-manual-view", state.view); } catch (err) {}
+}
 function renderAll(){
   const a = state.app;
   $("chips").innerHTML = [["", "All apps"], ...ORDER.map(k => [k, APPS[k].name])].map(([k,n]) => '<button type="button" data-app="' + k + '" aria-pressed="' + ((state.app || "") === k) + '" style="--c:' + (k ? ACC[k] : "var(--amber)") + '">' + esc(n) + "</button>").join("");
-  $("boardwrap").hidden = !a;
+  const sheet = state.view === "sheet";
+  $("views").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === state.view));
+  $("sheetwrap").hidden = !sheet; $("anscol").hidden = sheet;
+  $("boardwrap").hidden = !a || sheet;
   document.documentElement.style.setProperty("--acc", a ? ACC[a] : "var(--amber)");
   if (a){ $("note").textContent = APPS[a].note; $("appcode").textContent = CODE[a]; }
   $("src").textContent = a ? APPS[a].src : ORDER.map(k => APPS[k].src).join(" ");
+  if (sheet){ drawSheet(); return; }
   if (a){ if (!E16[a][state.layer]) state.layer = Object.keys(E16[a])[0]; drawBoard(); }
   render();
 }
 function setApp(a){
   state.app = a || null; state.active = null; state.pick = null; state.layer = a ? Object.keys(E16[a])[0] : null;
-  try { history.replaceState(null, "", a ? "#" + a : location.pathname); } catch (err) {}
+  setHash();
   try { localStorage.setItem("norns-manual-app", a || ""); } catch (err) {}
   renderAll();
 }
 function choose(e, scroll){
-  if (state.app !== e.app){ state.app = e.app; state.pick = null; try { history.replaceState(null, "", "#" + e.app); } catch (err) {} }
+  if (state.app !== e.app){ state.app = e.app; state.pick = null; }
+  state.view = "board"; setHash();
   state.active = state.active === e.id ? null : e.id;
   const layers = Object.keys(E16[e.app]);
   state.layer = e.layer && E16[e.app][e.layer] ? e.layer : (state.layer && E16[e.app][state.layer] && !e.layer ? state.layer : layers[0]);
@@ -790,11 +888,15 @@ let timer;
 function onSearch(){
   state.q = $("q").value; state.active = null;
   const {app} = parse(state.q);
-  if (app && app !== state.app){ state.app = app; state.pick = null; state.layer = Object.keys(E16[app])[0]; try { history.replaceState(null, "", "#" + app); } catch (err) {} }
+  if (state.q.trim()) state.view = "board";
+  if (app && app !== state.app){ state.app = app; state.pick = null; state.layer = Object.keys(E16[app])[0]; }
+  setHash();
   renderAll();
 }
 $("q").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(onSearch, 120); });
 $("qx").addEventListener("click", () => { $("q").value = ""; onSearch(); $("q").focus(); });
+$("views").addEventListener("click", ev => { const b = ev.target.closest("button"); if (!b) return; state.view = b.dataset.v; state.active = null; state.pick = null; setHash(); renderAll(); scrollTo(0, 0); });
+$("sheet").addEventListener("click", ev => { const b = ev.target.closest(".cs"); if (!b) return; state.pick = null; state.active = null; choose(ENTRIES[+b.dataset.id], false); scrollTo(0, 0); });
 $("chips").addEventListener("click", ev => { const b = ev.target.closest("button"); if (b) setApp(b.dataset.app); });
 $("layers").addEventListener("click", ev => { const b = ev.target.closest("button"); if (!b) return; state.layer = b.dataset.l; drawE16(); });
 $("grid").addEventListener("click", ev => {
@@ -823,11 +925,13 @@ $("insp").addEventListener("click", ev => { const b = ev.target.closest(".moves 
   if (state.active != null && (g.top < top || g.bottom > innerHeight)) $("grid").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); });
 $("results").addEventListener("click", ev => { const b = ev.target.closest(".row"); if (!b) return; state.pick = null; choose(ENTRIES[+b.dataset.id], true); });
 document.addEventListener("keydown", ev => { if (ev.key === "/" && document.activeElement !== $("q")){ ev.preventDefault(); $("q").focus(); } });
-function fromHash(){ const h = location.hash.replace("#",""); return APPS[h] ? h : null; }
-window.addEventListener("hashchange", () => { const h = fromHash(); if (h !== state.app) setApp(h); });
+function fromHash(){ const h = location.hash.replace("#",""), full = /(^|-)full$/.test(h), a = h.replace(/-?full$/, ""); return {app: APPS[a] ? a : null, view: h ? (full ? "board" : "sheet") : null}; }
+window.addEventListener("hashchange", () => { const h = fromHash(); if (h.app !== state.app || (h.view && h.view !== state.view)){ state.view = h.view || "sheet"; setApp(h.app); } });
 
-let start = fromHash();
-if (!start){ try { const s = localStorage.getItem("norns-manual-app"); if (APPS[s]) start = s; } catch (err) {} }
+const hs = fromHash();
+let start = hs.app;
+state.view = hs.view || "sheet";
+if (!location.hash){ try { const s = localStorage.getItem("norns-manual-app"); if (APPS[s]) start = s; const v = localStorage.getItem("norns-manual-view"); if (v === "board" || v === "sheet") state.view = v; } catch (err) {} }
 state.app = start; state.layer = start ? Object.keys(E16[start])[0] : null;
 const setTop = () => document.documentElement.style.setProperty("--bartop", ($("bar").offsetHeight + 12) + "px");
 new ResizeObserver(setTop).observe($("bar"));
