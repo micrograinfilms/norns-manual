@@ -803,6 +803,11 @@ $("grid").addEventListener("click", ev => {
   const same = state.pick && state.pick.type === "key" && state.pick.r === r && state.pick.c === c && state.active == null;
   state.active = null;
   state.pick = same ? null : {type:"key", r, c, title:"Row " + r + " key " + c + (k.t ? " (" + k.t + ")" : ""), info:k.i || ""};
+  /* keys that change what the E16 does switch its layer, as on the hardware */
+  const base = Object.keys(E16[state.app])[0];
+  if (state.app === "mutated" && r === 8 && c === 16) state.layer = state.layer === "ALT layer" ? base : "ALT layer";
+  else if (state.app === "still" && r === 8 && c <= 6) state.layer = same ? base : "Select held";
+  else if (state.app === "still" && r === 8 && c === 12) state.layer = state.layer === "LOOM mode" ? base : "LOOM mode";
   drawBoard();
 });
 $("e16").addEventListener("click", ev => {
