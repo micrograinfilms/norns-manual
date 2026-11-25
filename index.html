@@ -384,7 +384,7 @@ cb: [
  ["Patching","Plug or unplug a cable","Hold the key where it starts, tap the key where it lands.","Doing it again unplugs it. New cables start at 90 percent. A loop only sends and Out only receives.",{hold:[[1,1]],press:[[1,3]],tags:"cable patch connect plug unplug"}],
  ["Patching","Run a cable to another strip","Hold a key in one row, tap a key in another row.","For example, hold loop 2's key and tap the delay in row 1: loop 2 plays through strip 1's delay.",{hold:[[2,1]],press:[[1,3]],tags:"cable cross strip"}],
  ["Patching","Feed a box into itself","Double tap the box.","Double tap again to unplug it.",{press:[[1,3],[1,3]],same:true,x2:true,tags:"feedback self cable"}],
- ["Patching","Unplug a whole strip","Hold DUB and SPD, press any key of the strip: its loop key, a box, OUT or PLAY.","Every cable touching the strip is unplugged at once, including cables to other strips. The key you press does nothing else: no cable is plugged and no loop starts or stops. Keep holding both to clear several strips.",{hold:[[6,13],[6,14]],press:[[1,5]],tags:"clear unplug reset delete cables strip clr"}],
+ ["Patching","Unplug a whole strip","Hold DUB and SPD, press any key of the strip: its loop key, a box, OUT or PLAY.","Every cable touching the strip is unplugged at once, including cables to other strips. The key you press does nothing else: no cable is plugged and no loop starts or stops. Keep holding both to clear several strips.",{hold:[[6,13],[6,14]],press:[[1,5]],anyZone:["loop","box","out","play"],tags:"clear unplug reset delete cables strip clr"}],
  ["Patching","Set a cable's level","Hold its start key and landing key, turn CABL (knob 2).","Letting go after turning only sets the level.",{hold:[[1,1],[1,3]],knob:[2,"turn"],tags:"cable level volume"}],
  ["Patching","Set a box's self cable level","Hold just that box, turn CABL.","",{hold:[[1,3]],knob:[2,"turn"],tags:"feedback level cable"}],
  ["Patching","Read what's plugged in","Hold any key.","It shows full brightness, the keys it sends to light up (brighter for louder cables), everything else dims. Boxes in a feedback circle are brighter.",{hold:[[1,4]],tags:"view cables see"}],
@@ -599,6 +599,7 @@ ORDER.forEach(app => {
     const combo = h.length && (p.length || e.knob || h.length > 1);
     if (combo) h.forEach(k => add(k, "H"));
     p.forEach(k => { if (e.x2) add(k, "2×"); else if (h.length) add(k, "+"); else if (e.same && p.length > 1) add(k, "&"); });
+    (e.anyZone || []).forEach(id => (z[id] = z[id] || new Set()).add("+"));
   });
   GLYPH[app] = z;
 });
@@ -606,7 +607,7 @@ function glyphs(app, r, c){ const s = GLYPH[app][zone(app, r, c)]; return s ? ["
 
 function usesPick(e, p){
   if (e.app !== state.app) return false;
-  if (p.type === "key"){ const z = zone(e.app, p.r, p.c); return [...(e.hold||[]), ...(e.press||[])].some(k => zone(e.app, k[0], k[1]) === z); }
+  if (p.type === "key"){ const z = zone(e.app, p.r, p.c); return (e.anyZone || []).includes(z) || [...(e.hold||[]), ...(e.press||[])].some(k => zone(e.app, k[0], k[1]) === z); }
   return e.knob && e.knob[0] === p.n && (!e.layer || e.layer === p.layer || !e.kref);
 }
 function pickMoves(){ return state.pick ? ENTRIES.filter(e => usesPick(e, state.pick)) : []; }
