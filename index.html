@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Norns Manual</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* VOICE: a player's manual you can ask, plain and quick to scan
+   IDEA: the hardware board itself, grid left, E16 right, with every move lit on it
+   PICTURE: the board of the chosen app, keys and knobs tappable
+   COLOUR and TYPE: warm grey paper, charcoal board, one orange accent; Archivo, Plex Sans, Plex Mono
+   LAYOUT: search at the top, app chips, board, then answers grouped by section */
+:root{color-scheme:light dark;
+  --bg:light-dark(#eceae6,#171716);--panel:light-dark(#dcd9d3,#22211f);--ink:light-dark(#1d1c1a,#ecebe7);
+  --muted:light-dark(#615e57,#a09c94);--line:light-dark(#c9c5bd,#34332f);--accent:light-dark(#b65a12,#e08a3e);
+  --board:#2b2a28;--key:#3a3936;--edge:#4a4945;--on:#f1eee8;
+  --g-step:#4b7fa8;--g-page:#c88a2c;--g-mode:#6e9b5c;--g-nav:#8a8680;--g-temp:#b0558f;--g-rec:#c4443c;--g-alt:#7b6cb3;
+  --g-pattern:#3f9a94;--g-cycle:#c9a227;--g-fx:#a3743f;--g-key:#5f7fb4;--g-play:#6e9b5c;--g-danger:#c4443c;--g-loom:#3fa6c9;
+  --k:clamp(17px,calc((min(100vw,1240px) - 2*max(4vw,14px) - 70px)/17.3),44px);
+  --fd:"Archivo","Helvetica Neue",Arial,sans-serif;--fb:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;--fm:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--fb);overflow-x:clip}
+.wrap{max-width:1240px;margin:0 auto;padding:clamp(20px,3vw,40px) max(4vw,14px) 64px;display:flex;flex-direction:column;gap:18px}
+h1{font:800 clamp(30px,5vw,44px)/1.05 var(--fd);margin:0;letter-spacing:-.01em}
+.sub{margin:4px 0 0;color:var(--muted);max-width:70ch}
+.search{position:relative}
+.search input{width:100%;font:500 18px var(--fb);padding:14px 48px 14px 16px;border-radius:12px;border:2px solid var(--line);background:light-dark(#fff,#0f0f0e);color:var(--ink)}
+.search input:focus{outline:none;border-color:var(--accent)}
+.search button{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:22px;cursor:pointer}
+.tries{display:flex;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--muted);align-items:center}
+.tries button{font:500 13px var(--fb);border:1px dashed var(--line);background:transparent;color:var(--ink);padding:4px 10px;border-radius:999px;cursor:pointer}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{font:600 15px var(--fb);min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.note{margin:0;color:var(--muted);max-width:85ch}
+.board{background:var(--board);border-radius:14px;padding:clamp(10px,1.6vw,18px);display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.lab{font:600 11px var(--fm);letter-spacing:.1em;text-transform:uppercase;color:#9b978f;margin-bottom:6px}
+.grid{display:grid;grid-template-columns:12px repeat(16,var(--k));grid-template-rows:12px repeat(8,var(--k));gap:calc(var(--k)*.09)}
+.num{font:500 9px var(--fm);color:#77746d;display:flex;align-items:center;justify-content:center}
+.key{border-radius:calc(var(--k)*.16);background:var(--key);border:1px solid var(--edge);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:1px;overflow:hidden;cursor:pointer;color:var(--on)}
+.key.dark{background:#1c1b1a;border-color:#262523;cursor:default}
+.key .t{font:600 calc(var(--k)*.21)/1.05 var(--fm)}
+.key .s{font:400 calc(var(--k)*.165)/1.05 var(--fm);opacity:.8;margin-top:1px}
+.key.hold{background:#e0a43a!important;border-color:#f6d48e!important;box-shadow:0 0 0 3px #f6d48e;color:#1d1c1a}
+.key.press{background:#f4f1ea!important;border-color:#fff!important;box-shadow:0 0 0 3px #fff;color:#1d1c1a}
+.key.picked{box-shadow:0 0 0 3px var(--accent);border-color:var(--accent)}
+.hn{font:800 calc(var(--k)*.34)/1 var(--fm);color:#1d1c1a}
+.e16{display:grid;grid-template-columns:repeat(4,clamp(54px,13vw,64px));gap:8px}
+.knob{aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#2f2e2b;border:2px solid var(--ring,#6a6862);text-align:center;padding:3px;cursor:pointer;color:var(--on);font:inherit}
+.knob .t{font:600 11px var(--fm)}.knob .s{font:400 8px/1.1 var(--fm);opacity:.75}
+.knob.empty{opacity:.3;cursor:default}
+.knob.hl{background:#f4f1ea;border-color:#fff;box-shadow:0 0 0 3px #fff;color:#1d1c1a}
+.knob.picked{box-shadow:0 0 0 3px var(--accent)}
+.layers{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.layers button{font:600 12px var(--fm);min-height:32px;padding:4px 10px;border-radius:6px;cursor:pointer;background:transparent;color:#c9c5bd;border:1px solid #4a4945}
+.layers button[aria-pressed=true]{background:#f1eee8;color:#1d1c1a;border-color:#f1eee8}
+.enote{font:400 12px/1.45 var(--fm);color:#a9a59d;max-width:300px;margin-top:10px}
+.cap{background:var(--panel);border-radius:12px;padding:14px 16px;min-height:52px}
+.cap b{font:700 17px var(--fd)}.cap .how{font-weight:600;margin-top:4px}.cap p{margin:4px 0 0}
+.cap.empty{color:var(--muted)}
+.chip{font:600 11px var(--fm);color:#1d1c1a;background:#f4f1ea;border-radius:5px;padding:2px 6px;white-space:nowrap}
+.badge{font:600 12px var(--fb);color:var(--accent)}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.count{color:var(--muted);font-size:14px}
+.clear{font:600 14px var(--fb);border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;min-height:36px}
+h2{font:800 24px/1.1 var(--fd);margin:14px 0 0}
+h3{font:700 15px var(--fb);margin:10px 0 2px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:12px}
+.card{background:var(--panel);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;border:2px solid transparent;text-align:left;color:inherit;font:inherit}
+.card.on{border-color:var(--accent)}
+.card .ct{font:700 16px/1.25 var(--fd)}.card .cw{font-weight:600;font-size:15px}.card .cd{font-size:15px;opacity:.88}
+.card .app{font:600 12px var(--fb);color:var(--muted)}
+.pic{background:var(--board);border-radius:9px;padding:9px;display:flex;flex-wrap:wrap;gap:9px;align-items:flex-end}
+.pic .chip{flex:none;font-size:12px;padding:3px 7px}
+.mg{display:grid;grid-template-columns:repeat(16,12px);grid-template-rows:repeat(8,12px);gap:2px;flex:none}
+.me{display:grid;grid-template-columns:repeat(4,14px);gap:3px;flex:none}
+.mg i,.me i{display:flex;align-items:center;justify-content:center;font:700 8px/1 var(--fm);font-style:normal;border-radius:2px;color:#1d1c1a}
+.me i{aspect-ratio:1;border-radius:50%;border:1.5px solid #4a4945}
+.mg i.hold{background:#e0a43a!important;outline:2px solid #f6d48e}.mg i.press{background:#f4f1ea!important;outline:2px solid #fff}
+.me i.on{background:#f4f1ea;border-color:#f4f1ea}
+mark{background:light-dark(#f6d48e,#6b4a12);color:inherit;border-radius:3px;padding:0 1px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);align-items:center}
+.legend i{display:inline-flex;width:16px;height:16px;border-radius:3px;vertical-align:-3px;margin-right:6px;align-items:center;justify-content:center;font:700 9px var(--fm);font-style:normal;color:#1d1c1a}
+.empty-state{background:var(--panel);border-radius:12px;padding:18px}
+.src{font-size:13px;color:var(--muted)}
+@media (max-width:700px){.key .s{display:none}.board{gap:14px}}
+@media (prefers-reduced-motion:no-preference){.card,.key,.knob{transition:background .12s,box-shadow .12s,border-color .12s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Norns Manual</h1>
+    <p class="sub">Everything Mutated, Circuit Breaker, Fractured and Still can do, searchable. Type a question, pick an app, or tap any key or knob on the board to see every move that uses it.</p>
+  </header>
+
+  <div class="search">
+    <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Try: mutated mutes" aria-label="Search the manual">
+    <button id="qx" type="button" aria-label="Clear search">×</button>
+  </div>
+  <div class="tries" id="tries"><span>Try</span></div>
+
+  <div class="chips" id="chips" role="group" aria-label="App"></div>
+  <p class="note" id="note"></p>
+
+  <div id="boardwrap" hidden>
+    <div class="board">
+      <div><div class="lab">monome grid 128</div><div class="grid" id="grid"></div></div>
+      <div><div class="lab">OXI E16</div><div class="layers" id="layers"></div><div class="e16" id="e16"></div><div class="enote" id="enote"></div></div>
+    </div>
+  </div>
+  <div class="cap empty" id="cap" hidden></div>
+  <div class="legend" id="legend" hidden>
+    <span><i style="background:#e0a43a">H</i>hold</span>
+    <span><i style="background:#f4f1ea">1</i>press, in this order</span>
+    <span><i style="background:#f4f1ea">2x</i>double tap</span>
+    <span><i style="background:#f4f1ea;border-radius:50%">↻</i>turn a knob</span>
+    <span><i style="background:#f4f1ea;border-radius:50%">●</i>push a knob</span>
+  </div>
+
+  <div class="head"><h2 id="rtitle">Everything</h2><span class="count" id="count"></span></div>
+  <div id="results"></div>
+  <p class="src" id="src"></p>
+</div>
+
+<script>
+{
+/* ---------- grid layouts: put(row, col, label, sub, group, tint, info) ---------- */
+const G = n => "var(--g-" + n + ")";
+function blank(){ return Array.from({length:8}, () => Array(16).fill(null)); }
+function P(g, r, c, t, s, grp, tint, i){ g[r-1][c-1] = { t, s, grp, tint, i }; }
+
+function mutatedGrid(){
+  const g = blank();
+  for (let r = 1; r <= 6; r++) for (let c = 1; c <= 16; c++)
+    P(g, r, c, c === 1 ? "T" + r : String(c), c === 1 ? "/T" + (r + 6) : "", "step", c % 4 === 1 ? .95 : .7,
+      "Track row " + r + ": T" + r + " on page C, T" + (r + 6) + " on page T. Press an empty key to place a step, tap a placed step to clear it, hold steps and turn knobs to give them their own settings.");
+  for (let c = 1; c <= 16; c++) P(g, 7, c, "C" + c, "", "cycle", .85, "Cycle row, cycle " + c + ". Lit cycles exist, dim ones are skipped, the playing one blinks. In cycle mode, press to edit that cycle.");
+  P(g,8,1,"CLN","page C","nav",.85,"Track page C, the clean tracks T1 to T6. Hold and tap a track row to mute it. Press with TEX to open the slots.");
+  P(g,8,2,"TEX","page T","nav",.85,"Track page T, the textured tracks T7 to T12. Hold and tap a track row to mute it. Press with CLN to open the slots.");
+  ["1-16","17-32","33-48","49-64"].forEach((s,i) => P(g,8,4+i,String(i+1),s,"page",.85,"Step page " + (i+1) + ": shows steps " + s + " on every track row."));
+  P(g,8,9,"LEN","length","mode",.85,"Hold and press a key in a track row to make it the last step. Hold and tap cycles to skip them. With DIR: cycle mode on or off.");
+  P(g,8,10,"DIR","direction","mode",.85,"Hold and press key 1 to 4 in a track row: forward, backward, ping pong or random. With LEN: cycle mode on or off.");
+  P(g,8,12,"▲","up","nav",.85,"Selects the track above when let go. With ▼ held too it is COPY.");
+  P(g,8,13,"▼","down","nav",.85,"Selects the track below when let go. With ▲ held too it is COPY.");
+  P(g,8,14,"TEMP","snap back","temp",.85,"Hold to try changes that snap back when you let go. Double tap to keep it on.");
+  P(g,8,15,"REC","record","rec",.85,"Hold and turn knobs to record their movement. Double tap to keep it on. Also deletes cycles and slots when held with them.");
+  P(g,8,16,"ALT","layer 2","alt",.85,"Switches the E16 between its two layers of knobs.");
+  return g;
+}
+function cbGrid(){
+  const g = blank(), boxes = [["FLT","filter"],["DLY","delay"],["SMR","smear"],["GRN","grain"],["DIS","distortion"],["SLOT","slot"],["OUT","out"]];
+  for (let r = 1; r <= 4; r++){
+    P(g,r,1,"L"+r,"loop","play",.9,"Loop " + r + "'s loop key, where its cables start. Double tap to switch between continuous and triggered.");
+    boxes.forEach((b,i) => P(g,r,i+2,b[0],"","fx",.85, b[0] === "OUT" ? "Out for strip " + r + ": only what reaches Out is heard." : "The " + b[1] + " box of strip " + r + ". Hold a key and tap another to plug a cable. Double tap to feed it into itself."));
+    P(g,r,9,"CLR","x2","danger",.85,"Press twice within three seconds to unplug every cable touching strip " + r + ".");
+    for (let c = 11; c <= 14; c++) P(g,r,c,"PAT",String((r-1)*4+c-10),"pattern",.85,"Pattern " + ((r-1)*4+c-10) + ". Press empty to arm, press again to loop it.");
+    P(g,r,16,"PLAY","L"+r,"play",.9,"Play loop " + r + ". Continuous: press to start or stop. Triggered: plays while held.");
+  }
+  const pitches = ["-2 oct","-1 oct 5th","-1 oct","-5th","orig","+5th","+1 oct","+1 oct 5th","+2 oct"];
+  for (let r = 5; r <= 8; r++) pitches.forEach((p,i) => P(g,r,i+1,i===4?"L"+(r-4):"",p,"key",i===4?.95:.6,"Transpose loop " + (r-4) + " to " + p + "."));
+  P(g,6,13,"DUB","","rec",.85,"Hold and press a playing pattern to record more into it. With SPD: clear a pattern.");
+  P(g,6,14,"SPD","speed","rec",.85,"Hold and press a pattern to step its speed. With DUB: clear a pattern.");
+  ["network","loop","env","files"].forEach((p,i) => P(g,8,11+i,"PG"+(i+1),p,"nav",.85,"Screen page " + (i+1) + ": " + p + "."));
+  P(g,8,16,"PANIC","drain","danger",.85,"Drains every box to silence for two and a half seconds. Cables stay plugged in.");
+  return g;
+}
+function frGrid(){
+  const g = blank();
+  for (let r = 1; r <= 8; r++) P(g,r,1,r===1?"VEL":"",r===1?"loud":r===8?"quiet":"","rec",1-(r-1)*.08,"Velocity: top key full level, bottom key 24 dB quieter.");
+  for (let r = 1; r <= 8; r++) for (let c = 2; c <= 8; c++) P(g,r,c,"","","key",.55,"Keyboard: each key to the right is the next scale note, each row up three scale notes higher. Root notes are lit.");
+  P(g,1,2,"KEYS","notes","key",.95,"Keyboard: each key to the right is the next scale note, each row up three scale notes higher. Root notes are lit.");
+  for (let r = 1; r <= 4; r++){
+    for (let c = 11; c <= 14; c++) P(g,r,c,"PAT",String((r-1)*4+c-10),"pattern",.85,"Pattern " + ((r-1)*4+c-10) + ". Press empty to arm, press again to loop it.");
+    P(g,r,16,"LOOP "+r,"","play",.9,"Chooses loop " + r + " for the keyboard. Blinks while that loop has something playing.");
+  }
+  for (let c = 10; c <= 16; c++) P(g,5,c,c===10?"OFF":c===16?"FULL":"","","fx",.45+(c-10)*.08,"Send fader: sets the send chosen in row 6. Leftmost is off, then six levels.");
+  P(g,6,10,"REV","reverb","temp",.85,"Makes the fader above set the reverb send.");
+  P(g,6,11,"MUT","mutate","temp",.85,"Makes the fader above set mutate strength.");
+  P(g,6,12,"DLY","delay","temp",.85,"Makes the fader above set the delay send.");
+  P(g,6,14,"DUB","","rec",.85,"Hold and press a playing pattern to overdub it. With SPD: clear a pattern.");
+  P(g,6,15,"SPD","speed","rec",.85,"Hold and press a pattern to step its speed. With DUB: clear a pattern.");
+  ["play","rec","setup","fx"].forEach((p,i) => P(g,8,11+i,"PG"+(i+1),p,"nav",.85,"Screen page " + (i+1) + ": " + p + "."));
+  P(g,8,16,"UNDO","","danger",.85,"Puts the listening loop back the way it was about four seconds ago. Press again within six seconds to step further back.");
+  return g;
+}
+function stillGrid(){
+  const g = blank();
+  for (let r = 1; r <= 6; r++) for (let c = 1; c <= 16; c++)
+    P(g,r,c,c===1?"V"+r:String(c),c===1?"start":c===16?"end":"","key",c===1||c===16?.95:.6,"Voice " + r + ": each key is a position in its sound, column 1 the start, 16 the end. Hold to sound, double tap to latch, hold one and press another to travel.");
+  for (let c = 1; c <= 16; c++) P(g,7,c,"PAT",String(c),"pattern",.85,"Pattern " + c + ". Press empty to arm, press again to loop it.");
+  for (let c = 1; c <= 6; c++) P(g,8,c,"V"+c,"select","play",.9,"Voice " + c + " select: makes it the voice the E16 controls. Hold it and hold a key in its row to spray. In LOOM mode, starts and stops listening.");
+  P(g,8,9,"DUB","","rec",.85,"Hold and press a playing pattern to add to it. With SPD: clear a pattern.");
+  P(g,8,10,"SPD","speed","rec",.85,"Hold and press a pattern to step its speed. With DUB: clear a pattern.");
+  P(g,8,12,"LOOM","render","loom",.9,"LOOM mode on or off for the selected voice: render a stretched copy of part of its sound.");
+  P(g,8,14,"TEMP","snap back","temp",.85,"Hold to try changes that snap back when you let go. Double tap to keep it on.");
+  P(g,8,16,"STOP","all","danger",.85,"Releases every latched voice.");
+  return g;
+}
+
+/* ---------- E16 layers: [name, short, what it does] ---------- */
+const TAPE16 = " Holding knob 16 for a second starts or stops recording the norns's audio to tape.";
+const E16 = {
+  mutated: {
+    "Layer 1": [
+      ["VEL","velocity","How loud the hit plays."],["STRT","start","Where the sample starts. On a chopped kit slice, it covers only that slice."],["END","end","Where the sample ends. On a chopped kit slice, it covers only that slice."],["RVER","reverse","Push the button to switch reverse on or off."],
+      ["ATK","attack","Attack of each hit."],["REL","release","How long a hit lasts after its attack. At its top it reads OPEN and plays to the end of the sample or slice. A release longer than the part loops the part."],["DLY","delay send","How much goes to the delay."],["RVB","reverb send","How much goes to the reverb."],
+      ["FILT","filter","The track's filter."],["RES","resonance","Filter resonance."],["DIST","distortion","Distortion amount."],["TONE","dist tone","Distortion tone."],
+      ["GRAN","grain / ROT","Textured tracks (T7 to T12): grain. Clean tracks (T1 to T6): ROT, which rotates the track's steps around its length. Each cycle keeps its own rotation."],["SIZE","grain size","Grain size. Textured tracks only."],["SMER","smear","Smear. Textured tracks only."],["DRFT","smear drift","Smear drift. Textured tracks only." + TAPE16]
+    ],
+    "ALT layer": [
+      ["SLCS","slices","How many slices the sample is cut into. At its top it is HITS: a slice starts at each drum hit found, up to 64, shown as ticks on screen. \"hit sensitivity\" in PARAMETERS sets how easily a sound counts as a hit."],["SLCE","slice","Which slice a step plays."],["RAND","random start","Random start: with slices, a slice up to a few away; without, the played part shifted elsewhere in the sample."],["CHNC","chance","Chance a step plays. Below 100, the step plays only some of the time."],
+      ["PTCH","pitch","Pitch in the track's scale, two octaves up and down."],["SCAL","scale","The track's scale."],["SWNG","swing","Swing delays every second step, by up to half a step."],["TIME","micro timing","A step's micro timing: hold steps and turn to move them up to a whole step early or late."],
+      ["STRT","start","Start, also on this layer."],["END","end","End, also on this layer."],["VRND","random velocity","Random velocity: each hit up to 50 louder or quieter at full."],["MUTA","mutate amount","How much MUTATE changes this track. At zero, MUTATE makes a plain copy."],
+      ["SLOT","slot effect","Textured tracks: the slot effect, freezer (FREZ), stutter (STUT), shimmer (SHIM) or resonator (RESO). Set per track."],["SAMT","slot amount","Textured tracks: how much slot effect. Can be set per step."],["CHAR","slot character","Textured tracks. Freezer: hold time, a third of a second to twenty seconds. Stutter: fragment length. Shimmer: size. Resonator: how long the strings ring. Can be set per step."],["ROOT","resonator key","Textured tracks: the resonator's key. Can be set per step." + TAPE16]
+    ]
+  },
+  cb: { "E16": [
+    ["LVL","loop volume","Loop volume for the strip on screen."],["CABL","cable level","Hold a cable's start and landing keys, then turn to set how loud that cable is. Hold one box to set its cable into itself."],["FDBK","feedback trim","Turns down every feedback cable in the strip at once, leaving the main path playing."],["RVRB","reverb send","How much of this strip goes into the shared reverb."],
+    ["FILT","filter","One knob: low pass below the middle, wide open in the middle, high pass above. Reads L40, OPEN, H40."],["RES","resonance","Filter resonance: sharpens the tone without making it much louder."],["DLAY","delay repeats","From a single echo to a long tail, each one a little darker."],["TIME","delay time","Delay time. Glides when changed."],
+    ["SMER","smear","Smear amount: lengthens the spreading and sets how much haze is heard."],["DRFT","smear drift","How much the smear's echoes move, which keeps the haze alive."],["GRAN","grain","Grain amount: thickens the grain cloud."],["SIZE","grain size","From 20 ms buzzing grains to 800 ms smears."],
+    ["DIST","distortion","Up to 0.5 it is tape wear (wobble, saturation, hiss); above, overdrive fades in, growing into fuzz."],["TONE","dist tone","Darkens or brightens the distortion."],["SLOT","slot amount","Named for the effect in the slot: FREZ, STUT, SHIM or RSNR."],["SLOT","slot character","Named for the effect: HOLD (freezer hold time, a third of a second to twenty seconds), LEN (stutter fragment, 30 ms to half a second), SIZE (shimmer), RING (resonator ring time)." + TAPE16]
+  ]},
+  fractured: { "E16": [
+    ["LVL","level","The selected loop's level."],["BLND","blend","Blend from tape player to grain player. Same as norns E1."],["STRT","start","The selected loop's start point. The tape player loops from there to the end; grains read only from that part."],["GPOS","grain pos","Moves the grains around within the loop. Selected loop."],
+    ["FILT","filter","The selected loop's filter: low pass to the left, high pass to the right."],["RES","resonance","The selected loop's filter resonance."],["ATK","attack","The selected loop's attack."],["REL","release","The selected loop's release."],
+    ["STCH","stretch","How slowly the grains crawl through the loop, so a short loop can bloom over many seconds."],["GSIZ","grain size","Grain size."],["JITR","jitter","Grain position jitter."],["DENS","density","Grain density."],
+    ["TAPE","tape","Tape character on everything: wow and flutter, saturation, softened highs, hiss, and dropouts near the top. 0 is clean. Was named RIPL before Nov 24, 2026."],["SUBV","subvert","Selected loop. 0 changes nothing, 0.5 flattens loudness so tails hold up, 1 inverts it so quiet moments swell."],["REFL","reflect","Crossfades in a third player that loops a short region from the start point, each repeat the same length whatever note you play."],["KEEP","keep per pass","How much of the listening loop survives each pass (0.75 by default)." + TAPE16]
+  ]},
+  still: {
+    "Normal": [
+      ["LVL","level","The voice's level."],["SPRD","grain scatter","At 0 a stereo sound plays as recorded and a mono sound sits in the middle. Turning up scatters each grain across the stereo field."],["PTCH","pitch","Octaves and fifths, two octaves each way. Push to return to the original pitch. Off pitch, the label shows the pitch, such as -12."],["POS","fine position","Nudges where the voice sits, up to half a key either way."],
+      ["FILT","filter","One knob filter: low pass left, open in the middle, high pass right."],["RES","resonance","Resonance. Only acts once the filter is turned away from open."],["ATK","attack","Attack, 0.01 s to 10 s."],["REL","release","Release, 0.05 s to 20 s."],
+      ["STCH","stretch / TIME","Fully left plays at normal speed; turning right stretches up to 1000 times; the last few steps on the right are frozen (FRZ). Push to freeze or unfreeze. While the voice travels between two keys it is TIME: how long one move takes, a quarter second to two minutes."],["GSIZ","grain size","Grain size, 20 ms to 1 s."],["JITR","jitter","Grain jitter, 0 to 250 ms."],["OVLP","overlap","How many grains sound at once, 1 to 16. The grain rate follows the grain size."],
+      ["TAPE","tape","Wow and flutter, saturation, softened highs and hiss, dropouts near the top."],["DLY","delay send","Delay send; at the top it can be louder than the dry sound."],["RVB","reverb send","Reverb send; at the top it can be louder than the dry sound."],["DRFT","drift","Drift." + TAPE16]
+    ],
+    "Select held": [
+      ["LVL","level",""],["SPRD","scatter",""],["PTCH","pitch",""],["POS","position",""],
+      ["FILT","filter",""],["RES","resonance",""],["ATK","attack",""],["REL","release",""],
+      ["STCH","stretch",""],["GSIZ","grain size",""],["JITR","jitter",""],["OVLP","overlap",""],
+      ["LIFT","lift","While a voice's select key is held: turns the voice up where its sound is quiet, such as a fading tail, toward the level of its loudest part. 0 leaves it alone."],["RECH","reach","While select is held: how many neighboring rows a spray spills into, 0 to 5. 0 keeps it in its own row. Stops at rows 1 and 6."],["MIX","mix","While select is held: how many of a spray's grains come from the reached rows, 0 to 100%, shared equally among them."],["SETL","settle","While select is held: how long sprayed grains take to settle back, 0.05 s to 10 s."]
+    ],
+    "LOOM mode": [
+      ["STRT","part start","LOOM: where the part to render starts, in seconds."],["END","part end","LOOM: where the part ends."],["PTCH","pitch","LOOM renders at the PTCH pitch, and the pitch goes into the kept file's name."],["","",""],
+      ["","",""],["","",""],["","",""],["","",""],
+      ["STCH","stretch","LOOM: how far to stretch the part, 2x to 2000x."],["SCAT","scatter","LOOM: scatter, 0 to 100%."],["WEAV","weave","LOOM: weave, 1 to 16. More weave means more slices, so the render takes longer."],["DRFT","drift","LOOM: drift, 0 to 100%."],
+      ["","",""],["","",""],["","",""],["","",""]
+    ]
+  }
+};
+const KNOBNOTE = {
+  mutated: "Row 4 of each layer works on textured tracks (T7 to T12). On clean tracks, layer 1 knob 13 is ROT. Rings rest yellow in cycle mode, pink in TEMP; recorded knobs show red.",
+  cb: "The E16 controls the strip on screen. Each box has two neighboring knobs: strength on the left, character on the right. Red rings show knobs a playing pattern is moving.",
+  fractured: "LVL, STRT, GPOS, FILT, RES, ATK, REL and SUBV belong to the selected loop. Reverb, mutate and delay live on the grid's send fader.",
+  still: "The E16 controls the selected voice. Select held changes knobs 13 to 16 only. LOOM mode uses knobs 1, 2, 3 and 9 to 12; rings rest light blue there, pink in TEMP."
+};
+
+/* ---------- moves: [section, task, how, what happens, {hold, press, knob:[n,"turn"|"push"], layer, norns, badge, same, x2, tags}] ---------- */
+const UP = [[8,12],[8,13]];
+const DATA = {
+mutated: [
+ ["Playing","Start or stop playback","Press norns K3.","There is no play key on the grid.",{norns:"K3",tags:"play start stop transport"}],
+ ["Playing","Change the tempo","Turn norns E1.","",{norns:"E1",tags:"bpm speed clock"}],
+ ["Kits and sounds","Load a whole drum kit","With a clean track selected, press and let go of norns K2, then choose a kit file.","Pads 1 to 6 go onto T1 to T6, pad 1 on T1, with the kit's tuning. Tracks without a pad keep their sound. A folder of MPC kits lists just the kit names. The browser opens when you let go of K2.",{badge:"clean track selected",norns:"K2, let go",tags:"mpc xpm kit load browser drum"}],
+ ["Kits and sounds","Load one sound onto a track","Press and let go of K2, choose a single sound.","It goes onto the selected track only. Go up with ../ for the rest of the audio folder. On a textured track, K2 opens the audio folder.",{norns:"K2, let go",tags:"sample file load browser wav"}],
+ ["Kits and sounds","Hear a kit before loading it","In the browser, highlight the kit and turn norns E3 right.","Pads 1 to 6 play one after another, a quarter second apart. Turn E3 left to stop. The preview level is in PARAMETERS, under mutated sample browser.",{badge:"in the browser",norns:"E3 right",tags:"audition preview listen"}],
+ ["Kits and sounds","Random sounds on T1 to T6","Hold norns K2, then press K3.","Kick on T1, snare T2, closed hat T3, open hat T4, clap T5, percussion T6, each from your kits folder. A missing kind is filled by its nearest relative.",{norns:"hold K2 + K3",tags:"randomize random kit"}],
+ ["Kits and sounds","Change one track's sound","Select the track, turn norns E2.","A kit track steps through its kit's pads. Other clean tracks step through every sound of their kind (all kicks, all snares). A textured track steps through its sound's folder. The screen shows the name and place, such as T2 8/11. It loads when E2 rests and plays once if stopped.",{norns:"E2",tags:"next sound sample swap scroll"}],
+ ["Kits and sounds","Trim a chopped kit slice","On a track loaded from a chopped kit, turn STRT or END.","They cover only that slice, so each knob step is finer. The slice's start is moved to just before its first hit. Where a pad holds several hits, turn END down to keep the first.",{badge:"chopped kit track",knob:[3,"turn"],tags:"slice trim start end chop"}],
+ ["Kits and sounds","Where kits live","Copy kits into dust/audio/mutated/kits.","Two kinds go there: folders of MPC kit files (.xpm) next to their WAVs, and one shot packs with their folders kept (Kicks, Snares, Hats and so on). Breaks to slice can sit in dust/audio/mutated/breaks. ._ files and MPC project folders are ignored.",{tags:"folder kits path breaks one shot"}],
+ ["Kits and sounds","Random or E2 says it's still reading","Wait a moment.","The kits folder is read in the background after it changes, and kept in dust/data/mutated/kits_index.data. After that it starts at once.",{tags:"reading index slow"}],
+ ["Tracks and pages","Show the clean tracks","Press CLN.","Rows 1 to 6 become T1 to T6 (page C). Each page comes back to the track you last selected on it.",{press:[[8,1]],tags:"page clean drums"}],
+ ["Tracks and pages","Show the textured tracks","Press TEX.","Rows 1 to 6 become T7 to T12 (page T), which add grain, smear and a slot effect.",{press:[[8,2]],tags:"page textured texture"}],
+ ["Tracks and pages","Select another track","Press ▲ or ▼.","Selects the track above or below when you let go, wrapping within the page.",{press:[[8,12]],tags:"select track up down"}],
+ ["Tracks and pages","See steps 17 to 64","Press a step page key, 1 to 4.","Shows steps 1 to 16, 17 to 32, 33 to 48 or 49 to 64. Works in cycle mode too.",{press:[[8,5]],tags:"page steps longer"}],
+ ["Steps","Place a step","Press an empty key in a track row.","",{press:[[2,5]],tags:"add note trigger"}],
+ ["Steps","Clear a step","Quickly tap a step that's already placed.","",{press:[[2,5]],tags:"delete remove erase"}],
+ ["Steps","See a step's settings","Hold a placed step for a moment, then let go.","Its settings show on the screen and the step stays.",{hold:[[2,5]],tags:"view inspect"}],
+ ["Steps","Hear a step while stopped","Press it.","It plays with its own settings. It is still placed or cleared as usual, so tap again to put it back.",{badge:"stopped",press:[[2,5]],tags:"audition listen"}],
+ ["Steps","Hear a track without changing steps","While stopped, press ▲ or ▼.","The newly selected track plays once.",{badge:"stopped",press:[[8,13]],tags:"audition listen"}],
+ ["Steps","Give steps their own setting","Hold one or more steps and turn E16 knobs.","Only those steps change (a parameter lock). The setting is kept as a distance from the track's setting.",{hold:[[2,5],[2,9]],knob:[9,"turn"],tags:"parameter lock plock per step own"}],
+ ["Steps","Put steps back to the track's setting","Hold the steps and push that knob's button.","They follow the track again for that knob.",{hold:[[2,5],[2,9]],knob:[9,"push"],tags:"reset remove lock clear"}],
+ ["Steps","Change a whole track","Turn E16 knobs while holding no steps.","Steps with their own setting move along, keeping their difference.",{knob:[9,"turn"],tags:"track setting"}],
+ ["Steps","Copy a step onto others","Hold ▲ and ▼ (COPY), press the step to copy, then press the steps to paste onto.","Its own settings come along; knobs you didn't set follow each track. The sample stays each track's own, and micro timing stays behind.",{hold:UP,press:[[2,5],[4,9],[5,13]],tags:"copy paste duplicate"}],
+ ["Steps","Move steps early or late","Hold steps, press ALT, turn TIME (knob 8).","Micro timing, up to a whole step early or late.",{hold:[[2,5]],knob:[8,"turn"],layer:"ALT layer",tags:"micro timing nudge swing late early"}],
+ ["Steps","Reverse a track","Push knob 4's button (RVER).","Switches reverse on or off.",{knob:[4,"push"],tags:"reverse backward rver"}],
+ ["Length and direction","Set a track's length","Hold LEN, press the key that should be the last step.","Up to 64 steps. Tracks of different lengths drift against each other.",{hold:[[8,9]],press:[[2,12]],tags:"length len last step polymeter"}],
+ ["Length and direction","Set a track's direction","Hold DIR, press key 1, 2, 3 or 4 in the track's row.","Forward, backward, ping pong or random.",{hold:[[8,10]],press:[[2,3]],tags:"direction backward ping pong random reverse"}],
+ ["Length and direction","Rotate a track's steps","On a clean track, turn knob 13 (ROT).","Rotates the steps around the track's length. Each cycle keeps its own rotation. On textured tracks knob 13 is GRAN, so ROT isn't on a knob.",{knob:[13,"turn"],tags:"rot rotate shift offset"}],
+ ["Length and direction","Slice a sample","Press ALT, turn SLCS (knob 1) for the number of slices, SLCE (knob 2) to choose one.","SLCS at its top is HITS: a slice at each drum hit, up to 64. Hold steps and turn SLCE to give each step its own slice.",{knob:[1,"turn"],layer:"ALT layer",tags:"slice chop hits break"}],
+ ["Cycles","Cycle mode on or off","Press LEN and DIR together.","The E16 rings rest yellow and the screen shows CYCLES. Keys 4 to 7 stay step pages.",{press:[[8,9],[8,10]],same:true,tags:"cycle mode"}],
+ ["Cycles","Edit and hear one cycle","In cycle mode, press it on the cycle row (row 7).","Only that cycle plays, looping, and changes go into it alone.",{badge:"cycle mode",press:[[7,3]],tags:"cycle edit"}],
+ ["Cycles","Add a cycle","In cycle mode, press the faint key after the last cycle.","It's a copy of the cycle in view, on every track.",{badge:"cycle mode",press:[[7,5]],tags:"new cycle copy"}],
+ ["Cycles","MUTATE a cycle into another","In cycle mode, hold a cycle and press another cycle, or the faint key after the last.","The held cycle is mutated into that one, replacing what was there. Keep holding and press again for a new version. MUTA (ALT knob 12) sets how much each track changes.",{badge:"cycle mode",hold:[[7,1]],press:[[7,2]],tags:"mutate variation"}],
+ ["Cycles","Build up changes over cycles","Chain MUTATE: hold 1 press 2, hold 2 press 3, hold 3 press 4.","Cycles run in order with no gaps, so to reach cycle 4 the ones before it need to exist.",{badge:"cycle mode",hold:[[7,2]],press:[[7,3]],tags:"mutate chain evolve"}],
+ ["Cycles","What MUTATE changes","Nothing to press.","It keeps the strong beats (steps 1, 5, 9, 13) and changes the rest a little: moves a hit a step, drops one, adds a quiet ghost hit, nudges velocity, moves a pitch or slice by one, pushes filter, distortion and smear, and may rotate a step or two. The held cycle's recorded movement comes along.",{tags:"mutate explain"}],
+ ["Cycles","Set how much MUTATE changes a track","Press ALT, turn MUTA (knob 12).","At zero, the track gets a plain copy.",{knob:[12,"turn"],layer:"ALT layer",tags:"mutate amount muta"}],
+ ["Cycles","Delete a cycle","In cycle mode, hold the cycle and tap REC.","The cycles after it move down. The last cycle can't be deleted.",{badge:"cycle mode",hold:[[7,3]],press:[[8,15]],tags:"delete remove cycle"}],
+ ["Cycles","Copy one track into another cycle","In cycle mode, hold ▲ and ▼, tap the other cycle.","Copies the selected track's part, recorded movement included. Other tracks stay as they are.",{badge:"cycle mode",hold:UP,press:[[7,4]],tags:"copy paste cycle track part"}],
+ ["Cycles","Skip cycles","Hold LEN, tap cycles on the cycle row.","Tap again to play them. Works in and out of cycle mode. While LEN is held, playing cycles are bright and skipped ones dim. The last cycle playing can't be skipped. Skips are saved with the song.",{hold:[[8,9]],press:[[7,2],[7,5],[7,6]],tags:"skip cycle"}],
+ ["Cycles","Leave cycle mode","Press LEN and DIR together again.","Every cycle that isn't skipped plays in turn, starting from the first. Changes now go into every cycle, keeping their differences. The screen shows the cycle playing, such as C2/3.",{press:[[8,9],[8,10]],same:true,tags:"cycle mode off"}],
+ ["Recording knob movement","Record knob movement","Hold REC and turn E16 knobs.","Each knob gets its own lane that loops at the track's length, so you can build up one knob at a time. Turning a recorded knob by hand takes over while you turn it. Recorded knobs show red on the E16.",{hold:[[8,15]],knob:[9,"turn"],tags:"automation record motion rec"}],
+ ["Recording knob movement","Record into one cycle only","In cycle mode, hold REC and turn knobs.","It plays only when that cycle plays, then the knob goes back to the track's setting. The screen shows * beside CYCLES. A cycle's movement wins over the track's while that cycle plays.",{badge:"cycle mode",hold:[[8,15]],knob:[9,"turn"],tags:"automation record cycle"}],
+ ["Recording knob movement","Keep REC on","Double tap REC.","It blinks, leaving both hands free. Tap REC again to stop.",{press:[[8,15],[8,15]],same:true,x2:true,tags:"latch rec record"}],
+ ["Recording knob movement","Record only on some steps","With REC on, hold those steps and turn knobs.","Movement records only while a held step is playing.",{badge:"REC on",hold:[[2,5],[2,6]],knob:[9,"turn"],tags:"automation mask steps"}],
+ ["Recording knob movement","Erase one knob's movement","Hold REC, push that knob's button.","In cycle mode it erases the cycle's own movement.",{hold:[[8,15]],knob:[9,"push"],tags:"erase clear delete automation"}],
+ ["Recording knob movement","Erase all of a track's movement","Hold ▲ and ▼, tap REC.","In cycle mode, the cycle in view's movement.",{hold:UP,press:[[8,15]],tags:"erase clear delete automation"}],
+ ["Recording knob movement","Step, exact or soft playback","Hold REC (or have it on), turn norns E3.","STEP jumps between values, EXACT plays it as played (the default), SOFT 1 to 100% smooths it like a slow fader. Each track keeps its own.",{hold:[[8,15]],norns:"E3",tags:"smooth glide automation"}],
+ ["Mutes and whole pages","Mute or unmute a track","Hold CLN or TEX, tap anywhere in the track's row.","Holding TEX switches to page T, so you can mute textured tracks from anywhere. While held, rows light as bars: bright plays, dim muted. Muted steps show dim the rest of the time. Mutes are saved with the song.",{hold:[[8,1]],press:[[3,6]],tags:"mute unmute silence solo"}],
+ ["Mutes and whole pages","Change every track on a page","With TEMP on, hold CLN or TEX and turn E16 knobs.","Each track moves by the same amount from its own setting. It snaps back when TEMP ends; keep it with the keep combo under Slots. Without TEMP, nothing changes.",{badge:"TEMP on",hold:[[8,1]],knob:[9,"turn"],tags:"page all tracks macro"}],
+ ["Mutes and whole pages","Shift every pattern on a page","With TEMP on, hold a page key, turn knob 13.","ROT for every track on that page, clean and textured.",{badge:"TEMP on",hold:[[8,2]],knob:[13,"turn"],tags:"rotate rot page"}],
+ ["Mutes and whole pages","Which knobs change a whole page","Nothing to press.","Every page: VEL, STRT, END, ATK, REL, DLY, RVB, FILT, RES, DIST, TONE, and on ALT: RAND, CHNC, PTCH, SWNG, VRND. Page T only: SIZE, SMER, DRFT, SAMT, CHAR. One track at a time only: SLCS, SLCE, SCAL, TIME, MUTA, SLOT, ROOT.",{tags:"page knobs list"}],
+ ["Slots","Open or close the slots","Press CLN and TEX together.","The top row shows the 16 slots and stays open after you let go. Press CLN or TEX to close. Full slots are lit, yours brightest, empty ones faint.",{press:[[8,1],[8,2]],same:true,tags:"slot song save"}],
+ ["Slots","Save a song into a slot","With slots open, press an empty slot.","The song now belongs to that slot. Pressing its own slot saves it again.",{badge:"slots open",press:[[1,4]],tags:"save store slot"}],
+ ["Slots","Switch songs","With slots open, press a full slot.","While playing it switches at the next bar (16 steps) and blinks until then; stopped, at once. The song you leave is saved first. The screen shows the slot, such as S3. Switching waits while TEMP is on.",{badge:"slots open",press:[[1,3]],tags:"load switch song slot"}],
+ ["Slots","Delete a slot","With slots open, hold the slot and tap REC.","",{badge:"slots open",hold:[[1,3]],press:[[8,15]],tags:"delete remove clear slot"}],
+ ["TEMP","Try changes, then snap back","Hold TEMP while changing things.","Everything snaps back when you let go. The E16 rings rest pink.",{hold:[[8,14]],knob:[9,"turn"],tags:"temp temporary undo"}],
+ ["TEMP","Keep TEMP on","Double tap TEMP.","Tap it again to go back to how things were.",{press:[[8,14],[8,14]],same:true,x2:true,tags:"temp latch"}],
+ ["TEMP","Save the TEMP version as a new song","TEMP on, open the slots, press an empty slot.","TEMP stays on, and when it ends the song goes back to the slot you were on.",{badge:"TEMP on, slots open",press:[[1,4]],tags:"save temp"}],
+ ["TEMP","Keep the TEMP changes","TEMP on, open the slots, press this song's slot.","Saved there, and TEMP ends without snapping back. Other full slots aren't touched while TEMP is on.",{badge:"TEMP on, slots open",press:[[1,3]],tags:"keep save temp"}],
+ ["Saving","Save a song by name (PSET)","norns PARAMETERS, then PSET, then SAVE.","A PSET keeps the whole song, like a slot, plus the norns menu settings. Loading one saves the song you leave to its own slot first.",{tags:"pset save name"}],
+ ["Saving","Start from a blank song","Load PSET 1, INT.","INT is a blank song: no steps, one cycle, starting settings and starting samples. Save it as a new PSET to keep INT clean.",{tags:"new blank empty init int"}],
+ ["Saving","Where things are saved","Automatically.","Everything saves to dust/data/mutated/state.data; slots in dust/data/mutated/presets, one file per slot.",{tags:"autosave file data"}],
+ ["Audio and setup","Record the norns's audio","Hold E16 knob 16 for a second. Again to stop.","Takes are saved as numbered WAVs in dust/audio/tape.",{knob:[16,"push"],tags:"record tape bounce wav"}],
+ ["Audio and setup","Delay and reverb settings","PARAMETERS, then mutated delay and reverb.","Delay time, delay repeats, reverb decay, reverb tone and reverb size.",{tags:"delay reverb settings"}],
+ ["Audio and setup","Clicks at the start or end of hits","PARAMETERS, snap to zero crossings.","On by default: starts and ends move to the nearest zero crossing so cuts don't click. Works on WAVs.",{tags:"click pop zero crossing"}],
+ ["Audio and setup","Watch the processor load","Look at the bottom line of the screen.","CPU shows when there's room, and always at 75% or more in bright white. Around 90% the sound can crackle.",{tags:"cpu crackle glitch"}],
+ ["Audio and setup","Set up the E16","Load e16/norns-rings-compact.lua into the NORNS scene's script in the OXI App.","Set each knob's push action to Script, with the knob's own number as its ID. Load it again after updating Mutated.",{tags:"oxi e16 script setup"}]
+],
+cb: [
+ ["How it works","How a strip works","Nothing to press.","Each of rows 1 to 4 is a strip: loop, filter, delay, smear, grain, distortion, slot, Out. Cables carry sound between keys and only what reaches Out is heard. A cable from the loop straight to Out plays it untouched. Feedback happens when cables form a circle.",{tags:"explain strip network"}],
+ ["Patching","Plug or unplug a cable","Hold the key where it starts, tap the key where it lands.","Doing it again unplugs it. New cables start at 90 percent. A loop only sends and Out only receives.",{hold:[[1,1]],press:[[1,3]],tags:"cable patch connect plug unplug"}],
+ ["Patching","Run a cable to another strip","Hold a key in one row, tap a key in another row.","For example, hold loop 2's key and tap the delay in row 1: loop 2 plays through strip 1's delay.",{hold:[[2,1]],press:[[1,3]],tags:"cable cross strip"}],
+ ["Patching","Feed a box into itself","Double tap the box.","Double tap again to unplug it.",{press:[[1,3],[1,3]],same:true,x2:true,tags:"feedback self cable"}],
+ ["Patching","Unplug a whole strip","Press CLR, then again within three seconds.","Every cable touching the strip is unplugged, including cables to other strips. Without the second press, nothing happens.",{press:[[1,9],[1,9]],same:true,x2:true,tags:"clear unplug reset delete cables"}],
+ ["Patching","Set a cable's level","Hold its start key and landing key, turn CABL (knob 2).","Letting go after turning only sets the level.",{hold:[[1,1],[1,3]],knob:[2,"turn"],tags:"cable level volume"}],
+ ["Patching","Set a box's self cable level","Hold just that box, turn CABL.","",{hold:[[1,3]],knob:[2,"turn"],tags:"feedback level cable"}],
+ ["Patching","Read what's plugged in","Hold any key.","It shows full brightness, the keys it sends to light up (brighter for louder cables), everything else dims. Boxes in a feedback circle are brighter.",{hold:[[1,4]],tags:"view cables see"}],
+ ["Playing","Play or stop a loop","Press PLAY (column 16) or norns K2.","Continuous loops start or stop. Triggered loops play while you hold PLAY.",{press:[[1,16]],tags:"play start stop"}],
+ ["Playing","Continuous or triggered","Double tap the loop key.","Switches the loop between continuous and triggered.",{press:[[1,1],[1,1]],same:true,x2:true,tags:"mode trigger gate continuous"}],
+ ["Playing","Transpose a loop","Press a key in its pitch row (row 5 for loop 1 to row 8 for loop 4).","Two octaves down to two octaves up in fifths and octaves; column 5 is the original pitch. It works like tape: up an octave plays twice as fast. Patterns record it.",{press:[[5,7]],tags:"pitch transpose octave tune"}],
+ ["Playing","Silence everything","Press PANIC or norns K3.","Drains every box for two and a half seconds. Cables stay plugged in. Empties the reverb too.",{press:[[8,16]],norns:"K3",tags:"panic stop silence emergency"}],
+ ["Playing","Shape how a loop starts and stops","Page 3 (PG3): norns E2 chooses attack, decay, sustain or release, E3 sets it.","A slow attack fades in, a long release rings out. Starting values: 0.12 s, 0.3 s, 75 percent, 3.5 s. A new file resets them.",{press:[[8,13]],norns:"E2 / E3",tags:"envelope attack release adsr fade"}],
+ ["Playing","Set a loop's start and end","Page 2 (PG2): norns E2 moves the start, E3 the end.","They never cross; a loop is at least 20 ms.",{press:[[8,12]],norns:"E2 / E3",tags:"loop start end trim"}],
+ ["Playing","Choose a loop file","Page 4 (PG4): norns E2 picks the folder, E3 the file.","Loops live in dust/audio/fractured, shared with Fractured. A file loads when you stop turning, with its start, end and envelope reset.",{press:[[8,14]],norns:"E2 / E3",tags:"load sample file browser"}],
+ ["Patterns","Record a pattern","Press an empty pattern key, play, press it again.","Recording starts with your first move and it loops right away. Patterns record loops started and stopped, cables, E16 settings and loop start and end.",{press:[[1,11]],tags:"pattern record loop"}],
+ ["Patterns","Stop or play a pattern","Press it.","Stopping a pattern also stops a triggered loop it was playing.",{press:[[1,11]],tags:"pattern stop play"}],
+ ["Patterns","Overdub a pattern","Hold DUB, press a playing pattern.","Press the pattern again to finish.",{hold:[[6,13]],press:[[1,12]],tags:"overdub dub add"}],
+ ["Patterns","Change a pattern's speed","Hold SPD, press the pattern.","Steps through normal, half, quarter and double.",{hold:[[6,14]],press:[[1,12]],tags:"speed half double"}],
+ ["Patterns","Clear a pattern","Hold DUB, then SPD too, press the pattern.","It empties at once and silently. Keep holding both to clear several.",{hold:[[6,13],[6,14]],press:[[1,12]],tags:"clear delete erase pattern"}],
+ ["Patterns","What a pattern changes","Nothing to press.","A pattern only owns what it changes: each pass, its cables and settings go back to where they were when it first touched them. Everything else is yours, so you can rewire while it plays. Knobs a playing pattern moves show red on the E16.",{tags:"explain pattern"}],
+ ["Slot effect","Change a strip's slot effect","Press PG1, tap any key in the strip's row once, turn norns E2.","Freezer, stutter, shimmer or resonator. Cables and settings stay and it can change while playing. Tap only once: a double tap feeds a box into itself.",{press:[[8,11],[2,7]],norns:"E2",tags:"slot effect freezer stutter shimmer resonator"}],
+ ["Slot effect","Set the resonator's key","On the network page, turn norns E3.","",{badge:"resonator in the slot",norns:"E3",tags:"resonator key root"}],
+ ["Slot effect","What each slot effect does","Nothing to press.","Freezer (FRZ) holds a moment as a drone and follows its loop. Stutter (STU) repeats the latest fragment four times. Shimmer (SHM) is a reverb blooming up an octave. Resonator (RES) is six tuned strings that ring along.",{tags:"freezer stutter shimmer resonator explain"}],
+ ["Slot effect","The freezer glitches the sound","PARAMETERS, freezer: smooth, medium or light.","Smooth is the default and fine on a Pi 4. On a Pi 3B+, medium or light avoid glitching.",{tags:"freezer cpu glitch pi"}],
+ ["Feedback","Tame feedback in a strip","Turn FDBK (knob 3).","Turns down every feedback cable in the strip at once, leaving the main path playing.",{knob:[3,"turn"],tags:"feedback trim too loud"}],
+ ["Feedback","Ringing tones or long echoes","PARAMETERS, lap time.","How long a return cable waits before sound comes back, 20 ms to 1 s (0.35 s default). Short laps ring like strings; long uneven laps make evolving echoes.",{tags:"lap time feedback pitch"}],
+ ["Feedback","Too quiet","Raise the norns LEVELS output, or PARAMETERS output level.","Output level runs 12 dB down to 6 dB up. The output is turned down 8 dB after the limiter to leave room.",{tags:"volume quiet loud output level"}],
+ ["Reverb","Send a strip to the reverb","Turn RVRB (knob 4).","Each strip sends its own amount, taken from what reaches its Out. The reverb never feeds back into the network.",{knob:[4,"turn"],tags:"reverb send"}],
+ ["Reverb","Shape the reverb","PARAMETERS, reverb.","Decay 0.3 to 20 s (3.5 default), tone dark, warm or bright, and size.",{tags:"reverb decay tone size"}],
+ ["Screen","Change screen pages","Press PG1 to PG4, or turn norns E1.","Network, loop, envelope, files.",{press:[[8,11]],norns:"E1",tags:"page screen"}],
+ ["Saving","Save a sound (PSET)","norns PARAMETERS, then PSET, then SAVE.","Keeps every setting of all four strips, the reverb, the cables and all sixteen patterns.",{tags:"pset save load"}],
+ ["Saving","Autosave","Automatically.","Saves when the script closes and every three minutes while you play.",{tags:"autosave"}],
+ ["Audio and setup","Record the norns's audio","Hold E16 knob 16 for a second. Again to stop.","The E16 title shows REC and the time. Takes go to dust/audio/tape.",{knob:[16,"push"],tags:"record tape bounce wav"}],
+ ["Audio and setup","Keep knob names showing","PARAMETERS, EDIT, readings on moves (under e16): off.","Turning a knob still shows its reading.",{tags:"e16 readings names"}]
+],
+fractured: [
+ ["Playing","Play a note","Press a keyboard key (columns 2 to 8).","Each key to the right is the next scale note; each row up is three scale notes higher. Root notes are lit.",{press:[[4,5]],tags:"note keyboard play"}],
+ ["Playing","Set how loud notes play","Press a key in the velocity column.","Top is full level, bottom 24 dB quieter. Each note keeps its velocity, in patterns too.",{press:[[2,1]],tags:"velocity volume loud quiet"}],
+ ["Playing","Choose a loop","Press LOOP 1 to 4 (column 16).","The keyboard plays that loop. It blinks while something plays on it.",{press:[[2,16]],tags:"loop select sample"}],
+ ["Playing","Blend tape and grains","Turn norns E1 or BLND (knob 2).","Tape is pitch and speed together; grains keep pitch while crawling through the loop.",{norns:"E1",knob:[2,"turn"],tags:"blend tape grain"}],
+ ["Playing","Change the key","Page 1: turn norns E3.","Patterns transpose within the scale.",{press:[[8,11]],norns:"E3",tags:"key root note transpose"}],
+ ["Playing","Change scale or octave","Page 3: norns E2 chooses the row, E3 changes it.","",{press:[[8,13]],norns:"E2 / E3",tags:"scale octave mode"}],
+ ["Playing","Low notes get buried","Page 3, tilt.","Notes below the original pitch get louder and above quieter, 3 dB per octave by default, up to 6.",{press:[[8,13]],tags:"tilt balance low"}],
+ ["Sends","Choose reverb, mutate or delay","Press REV, MUT or DLY (row 6).","The fader row above then shows and sets that send. The chosen key is bright.",{press:[[6,11]],tags:"send reverb delay mutate"}],
+ ["Sends","Set the chosen send","Press a key on the send fader (row 5).","Leftmost is off, rightmost full. Presses are recorded into patterns.",{press:[[5,14]],tags:"send level fader"}],
+ ["Sends","Set mutate strength","Press MUT, then a fader key.","Mutate strength moves all three mutators at once. From level 2 of 6 they also erase and move pieces of the listening loop.",{press:[[6,11],[5,13]],tags:"mutate mutators strength"}],
+ ["Listening loop","Freeze the listening loop","Press norns K2.","Listening off freezes the loop exactly as it is. K2 again turns it back on.",{norns:"K2",tags:"freeze listen hold"}],
+ ["Listening loop","Clear the listening loop","Tap norns K3.","UNDO brings it back.",{norns:"K3",tags:"clear erase delete"}],
+ ["Listening loop","Undo","Press UNDO.","Restores the loop as it was about four seconds ago. Press again within six seconds to step further back. It also silences mutator fragments and delay echoes.",{press:[[8,16]],tags:"undo back"}],
+ ["Listening loop","Save the listening loop","Hold norns K3 for a second.","Written as a WAV to dust/audio/fractured/captures, named by date and time.",{norns:"hold K3",tags:"save capture export wav"}],
+ ["Listening loop","How long the loop remembers","KEEP (knob 16) and page 3's length.","KEEP is how much survives each pass (0.75 default). Length is 2 to 60 s (5 default).",{knob:[16,"turn"],tags:"keep length decay fade"}],
+ ["Listening loop","Hear the loop all the time","Page 3, loop playback.","By default the loop is heard only while mutate strength is up.",{press:[[8,13]],tags:"loop playback hear"}],
+ ["Patterns","Record a pattern","Press an empty pattern key, play, press it again.","Recording starts with your first press and it loops right away. Patterns record notes, sends, filter and page 2 settings.",{press:[[1,11]],tags:"pattern record"}],
+ ["Patterns","Stop or play a pattern","Press it.","",{press:[[1,11]],tags:"pattern stop play"}],
+ ["Patterns","Overdub a pattern","Hold DUB, press a playing pattern.","Press the pattern again to finish.",{hold:[[6,14]],press:[[1,12]],tags:"overdub dub"}],
+ ["Patterns","Change a pattern's speed","Hold SPD, press the pattern.","Normal, half, quarter and double.",{hold:[[6,15]],press:[[1,12]],tags:"speed half double"}],
+ ["Patterns","Clear a pattern","Hold DUB, then SPD too, press the pattern.","Silent, whatever state it was in.",{hold:[[6,14],[6,15]],press:[[1,12]],tags:"clear delete erase pattern"}],
+ ["Sound","Change the filter","Turn FILT (knob 5) or, on page 1, norns E2.","Low pass to the left, high pass to the right, per loop.",{knob:[5,"turn"],tags:"filter lowpass highpass"}],
+ ["Sound","Load a different loop file","Page 3: the folder row, then the sample row.","Loops live in dust/audio/fractured, in folders if you like. With audition on, each file plays for two seconds.",{press:[[8,13]],norns:"E2 / E3",tags:"load sample file browser folder"}],
+ ["Sound","Tape, subvert and reflect","Page 4, or knobs 13 to 15.","TAPE adds tape wear, SUBV reshapes loudness, REFL adds a short repeating player.",{press:[[8,14]],knob:[13,"turn"],tags:"tape subvert reflect fx"}],
+ ["Sound","Mutator settings","norns PARAMS.","Mutator level, pitch (same, octaves or scale notes), shortest fragment, take away amount, and mutators into buffer.",{tags:"mutators settings"}],
+ ["Screen","Change screen pages","Press PG1 to PG4.","Play, rec, setup, fx.",{press:[[8,11]],tags:"page screen"}],
+ ["Saving","Save everything (PSET)","norns PARAMS, then PSET.","Every setting, all sixteen patterns and the listening loop. Patterns come back stopped.",{tags:"pset save load"}],
+ ["Saving","Autosave","Automatically.","Saves on close and every three minutes while you play, separately from PSETs.",{tags:"autosave"}],
+ ["Audio and setup","Record the norns's audio","Hold E16 knob 16 for a second. Again to stop.","Takes go to dust/audio/tape. Separate from saving the listening loop.",{knob:[16,"push"],tags:"record tape bounce wav"}]
+],
+still: [
+ ["Playing a voice","Sound a voice","Hold a key in its row (rows 1 to 6).","It sounds from that position and crawls on at its stretch. Column 1 is the start of the sound, column 16 the end. Playing a row selects that voice for the E16.",{hold:[[3,6]],tags:"play hold voice"}],
+ ["Playing a voice","Latch a voice","Double tap a key in its row.","It keeps sounding. Double tap again, press K3, or press STOP to release.",{press:[[3,6],[3,6]],same:true,x2:true,tags:"latch hold sustain"}],
+ ["Playing a voice","Travel between two positions","Hold one key, press a second in the same row.","The voice moves back and forth between them, and knob 9 becomes TIME.",{hold:[[3,4]],press:[[3,10]],tags:"travel scan between two"}],
+ ["Playing a voice","Keep traveling, hands free","Hold one key, double tap the second.","It keeps traveling after you let go. A latched voice given a second key does too.",{hold:[[3,4]],press:[[3,10],[3,10]],same:true,x2:true,tags:"travel latch"}],
+ ["Playing a voice","Set the travel time","While traveling, turn knob 9 (TIME).","How long one move from one key to the other takes, a quarter second to two minutes.",{badge:"traveling",knob:[9,"turn"],tags:"time travel speed"}],
+ ["Playing a voice","Move a latched voice","Press another key in its row.","It jumps there and stays latched.",{badge:"latched",press:[[3,10]],tags:"jump move position"}],
+ ["Playing a voice","Choose the voice the E16 controls","Press its select key (row 8, keys 1 to 6).","Without playing it. The selected row glows faintly.",{press:[[8,3]],tags:"select voice e16"}],
+ ["Playing a voice","Latch or release the selected voice","Press norns K3.","",{norns:"K3",tags:"latch release"}],
+ ["Playing a voice","Release every voice","Press STOP.","",{press:[[8,16]],tags:"stop release panic silence all"}],
+ ["Stretch and freeze","Stretch further or less","Turn STCH (knob 9).","Fully left plays at normal speed. Turning right stretches, up to 1000 times. The last few steps are frozen and read FRZ.",{knob:[9,"turn"],tags:"stretch slow speed"}],
+ ["Stretch and freeze","Freeze a voice","Push STCH (knob 9).","Push again to let it crawl. Turning STCH or TIME also unfreezes.",{knob:[9,"push"],tags:"freeze frozen hold"}],
+ ["Stretch and freeze","Change pitch","Turn PTCH (knob 3).","Octaves and fifths, two octaves each way. Off pitch, the label shows it, such as -12.",{knob:[3,"turn"],tags:"pitch transpose octave"}],
+ ["Stretch and freeze","Back to original pitch","Push PTCH (knob 3).","",{knob:[3,"push"],tags:"pitch reset"}],
+ ["Stretch and freeze","Nudge the position","Turn POS (knob 4).","Up to half a key either way.",{knob:[4,"turn"],tags:"fine position nudge"}],
+ ["Spray","Spray","With the voice sounding, hold its select key (row 8), then hold a key in its row.","Grains scatter from the voice's place out as far as that key, and the same distance the other way, for as long as you hold. One key away shimmers; far away reaches most of the sound. Let go and they settle back. Grains never land past key 1 or key 16.",{badge:"voice sounding",hold:[[8,3],[3,12]],tags:"spray scatter throw both hands"}],
+ ["Spray","Spray into other rows (REACH)","Hold the voice's select key, turn knob 14.","RECH: how many neighboring rows a spray reaches into, 0 to 5, stopping at rows 1 and 6. The reached rows flicker dimly.",{hold:[[8,3]],knob:[14,"turn"],layer:"Select held",tags:"reach rech spray rows"}],
+ ["Spray","How much comes from those rows (MIX)","Hold the voice's select key, turn knob 15.","MIX: how many of the spray's grains come from the reached rows, shared equally.",{hold:[[8,3]],knob:[15,"turn"],layer:"Select held",tags:"mix spray"}],
+ ["Spray","How fast it settles (SETL)","Hold the voice's select key, turn knob 16.","SETL: how long sprayed grains take to settle back, 0.05 s to 10 s.",{hold:[[8,3]],knob:[16,"turn"],layer:"Select held",tags:"settle setl spray"}],
+ ["Spray","Play spray from a pattern","Record sprays into a pattern, then hold select and turn REACH, MIX or SETL while it plays.","The main way to play spray: the pattern sprays, your hands shape it.",{badge:"pattern playing sprays",hold:[[8,3]],knob:[14,"turn"],layer:"Select held",tags:"spray pattern"}],
+ ["Sound","Bring up quiet tails (LIFT)","Hold the voice's select key, turn knob 13.","Turns the voice up where its sound is quiet, toward its loudest part. 0 leaves it alone.",{hold:[[8,3]],knob:[13,"turn"],layer:"Select held",tags:"lift quiet tail boost compress"}],
+ ["Sound","Load a sound into a voice","Select the voice, press and let go of norns K2, choose a file.","Turn E3 right to preview; while a preview plays, E2 plays each sound you scroll to. Preview level is in PARAMETERS.",{norns:"K2, let go",tags:"load sample file browser preview audition"}],
+ ["Sound","Step through sounds in the folder","Turn norns E2.","The selected voice steps through the other sounds in its folder.",{norns:"E2",tags:"next sound scroll"}],
+ ["Sound","Why the keys skip silence","Nothing to press.","When a sound loads, silence at each end is trimmed (judged 60 dB below its peak for WAVs), keeping fading tails and fade ins. The 16 keys cover only what's left.",{tags:"trim silence explain"}],
+ ["LOOM","Go into LOOM mode","Select the voice, press LOOM (row 8, key 12).","Renders part of the voice's sound as a new stretched file, in the background. The screen shows a bright LOOM bar with seconds in, seconds out and about how long it will take. The key blinks slowly; the E16 rests light blue.",{press:[[8,3],[8,12]],tags:"loom render stretch mode"}],
+ ["LOOM","Choose the part","Hold two keys in the voice's row, or turn STRT and END (knobs 1 and 2).","One key alone moves the part there, keeping its length. The part lights on the row and shows bracketed on screen. Each sound remembers its part.",{badge:"LOOM mode",hold:[[3,4]],press:[[3,8]],tags:"part region select loom"}],
+ ["LOOM","Listen in LOOM","Press the voice's select key.","LOOM is silent until you ask. The original plays the part over and over at normal speed; a draft plays through from the start. Press again to stop.",{badge:"LOOM mode",press:[[8,3]],tags:"listen hear preview loom"}],
+ ["LOOM","Set the stretch","Turn STCH, SCAT, WEAV and DRFT (knobs 9 to 12).","STCH 2x to 2000x, SCAT and DRFT 0 to 100%, WEAV 1 to 16. More WEAV takes longer to render. PTCH sets the pitch it renders at.",{badge:"LOOM mode",knob:[9,"turn"],layer:"LOOM mode",tags:"stretch scatter weave drift loom"}],
+ ["LOOM","Render","Press norns K3.","Runs in the background, quiet while rendering; the key blinks fast and the screen shows the percent. When done, the draft plays.",{badge:"LOOM mode",norns:"K3",tags:"render bounce loom"}],
+ ["LOOM","Play the draft from a key","Press a key in the voice's row.","While you're hearing the draft, the row plays it from that key. STRT and END still choose the part for the next render.",{badge:"draft ready",press:[[3,9]],tags:"draft play loom"}],
+ ["LOOM","Render again","Press norns K3 again.","Replaces the draft.",{badge:"draft ready",norns:"K3",tags:"again redo loom"}],
+ ["LOOM","Keep the render","Press and let go of norns K2.","Saved next to the original, named like \"name LOOM 59x.wav\" with the pitch if changed. It goes on the voice, latched, playing from the start.",{badge:"draft ready",norns:"K2, let go",tags:"keep save loom"}],
+ ["LOOM","Leave LOOM mode","Press LOOM again.","The voice goes back to how it was. A render keeps going and a draft waits, so you can come back to it. Loading a different sound on that voice, or closing Still, throws it away.",{press:[[8,12]],tags:"exit leave loom discard"}],
+ ["Patterns and TEMP","Record a pattern","Press an empty PAT key (row 7), play, press it again.","Records grid presses on the voice rows and E16 turns and pushes, at whatever length you play.",{press:[[7,11]],tags:"pattern record"}],
+ ["Patterns and TEMP","Stop or play a pattern","Press it.","Stopping lets go of any voice it was holding.",{press:[[7,11]],tags:"pattern stop play"}],
+ ["Patterns and TEMP","Overdub a pattern","Hold DUB, press a playing pattern.","Press the pattern again to finish.",{hold:[[8,9]],press:[[7,12]],tags:"overdub dub"}],
+ ["Patterns and TEMP","Change a pattern's speed","Hold SPD, press the pattern.","Normal, half, quarter and double.",{hold:[[8,10]],press:[[7,12]],tags:"speed half double"}],
+ ["Patterns and TEMP","Clear a pattern","Hold DUB and SPD, press the pattern.","",{hold:[[8,9],[8,10]],press:[[7,12]],tags:"clear delete erase pattern"}],
+ ["Patterns and TEMP","Try changes, then snap back","Hold TEMP while changing knobs, freezes or sounds.","They snap back when you let go. Double tap to keep it on; tap again to snap back. The E16 rests pink.",{hold:[[8,14]],knob:[9,"turn"],tags:"temp temporary"}],
+ ["Audio and setup","Record the norns's audio","Hold E16 knob 16 for a second. Again to stop.","Takes go to dust/audio/tape.",{knob:[16,"push"],tags:"record tape bounce wav"}],
+ ["Audio and setup","Something went wrong","Check dust/data/still/lua_log.txt and engine_log.txt.","Loading, closing, errors and sound trimming are logged. State is in state.data, with a copy made each time Still opens.",{tags:"error log crash bug"}]
+]};
+
+const APPS = {
+  mutated:{name:"Mutated",grid:mutatedGrid,note:"Rows 1 to 6 are the tracks on the current page: T1 to T6 on page C, T7 to T12 on page T. Row 7 is the cycle row. Keys 4 to 7 on the bottom row are step pages.",src:"From the Mutated README and code, Nov 25, 2026 (includes mutes and whole page changes)."},
+  cb:{name:"Circuit Breaker",grid:cbGrid,note:"Rows 1 to 4 are the strips of loops 1 to 4, each laid out the same way. Rows 5 to 8 transpose loops 1 to 4.",src:"From the Circuit Breaker README, Nov 25, 2026."},
+  fractured:{name:"Fractured",grid:frGrid,note:"Column 1 is velocity, columns 2 to 8 the in key keyboard. Patterns and pages sit where they do in Circuit Breaker.",src:"From the Fractured README, Nov 24, 2026 (RIPL renamed TAPE)."},
+  still:{name:"Still",grid:stillGrid,note:"Rows 1 to 6 are voices 1 to 6, each key a position in that voice's sound. Row 7 is patterns 1 to 16. On the real grid only each voice's position lights.",src:"From Still's code as of Nov 25, 2026 (spray, LIFT and LOOM included; its README hasn't caught up yet)."}
+};
+const ORDER = ["mutated","cb","fractured","still"];
+
+/* build entries, knobs included */
+const ENTRIES = [];
+ORDER.forEach(app => {
+  DATA[app].forEach(([s,t,how,d,c]) => ENTRIES.push({app,s,t,how,d,...(c||{})}));
+  Object.entries(E16[app]).forEach(([layer,knobs]) => knobs.forEach((k,i) => {
+    if (!k[0] || !k[2]) return;
+    ENTRIES.push({app,s:"E16 knobs",t:k[0] + ", " + k[1],how:"Knob " + (i+1) + (Object.keys(E16[app]).length > 1 ? ", " + layer : ""),d:k[2],knob:[i+1,"turn"],layer,kref:true,tags:"knob e16 " + k[0]});
+  }));
+});
+ENTRIES.forEach((e,i) => { e.id = i; e.hay = {t:(e.t).toLowerCase(), tags:(e.tags||"").toLowerCase() + " " + (e.badge||"").toLowerCase(), how:e.how.toLowerCase(), d:(e.d + " " + e.s).toLowerCase()}; });
+
+/* ---------- search ---------- */
+const STOP = new Set("how do i a an the to my me what does is in on of with can you it and or for get make way there this that use using want show where which when are be does".split(" "));
+const APPWORD = {mutated:"mutated",circuit:"cb",breaker:"cb",cb:"cb",fractured:"fractured",still:"still"};
+const SYN = {
+  mute:["mute","unmute","silence"],save:["save","slot","pset","keep","capture"],load:["load","browser","choose","file"],
+  delete:["delete","clear","erase","remove","discard"],clear:["clear","erase","delete","empty"],erase:["erase","clear","delete"],remove:["remove","clear","delete","erase"],
+  copy:["copy","paste","duplicate"],paste:["paste","copy"],record:["record","rec","tape"],automation:["automation","record knob","movement"],
+  pattern:["pattern"],speed:["speed","spd"],overdub:["overdub","dub"],pitch:["pitch","transpose","ptch","octave"],transpose:["transpose","pitch"],
+  reverse:["reverse","rver","backward"],undo:["undo","snap back"],freeze:["freeze","frozen","frz"],tempo:["tempo","bpm"],
+  volume:["volume","level","lvl","loud"],loud:["loud","level","volume","velocity"],random:["random","rand"],sample:["sample","sound","file"],sound:["sound","sample","file"],
+  stretch:["stretch","stch"],length:["length","len"],direction:["direction","dir"],swing:["swing","swng"],timing:["timing","time"],
+  cable:["cable","patch"],patch:["patch","cable"],feedback:["feedback","fdbk"],reverb:["reverb","rvb","rvrb"],delay:["delay","dly","dlay"],
+  filter:["filter","filt"],slice:["slice","slcs","slce","chop"],chop:["chop","slice"],stop:["stop","release","panic"],
+  latch:["latch"],spray:["spray","rech","setl"],kit:["kit","pad"],drum:["drum","kit"],plock:["parameter lock","own setting"],lock:["lock","own setting"],
+  rotate:["rotate","rot"],shift:["shift","rot","rotate"],solo:["mute"],silence:["silence","mute","panic"],song:["song","slot"],preset:["pset","slot"],
+  bounce:["tape","record"],export:["capture","save","tape"],render:["render","loom"],part:["part"],audition:["audition","preview","hear"],preview:["preview","hear","audition"]
+};
+function stem(w){ return w.replace(/(ing|ed|es|s)$/,"").replace(/(.)\1$/,"$1"); }
+function variants(w){
+  const base = SYN[w] || SYN[stem(w)] || [];
+  const st = stem(w);
+  return [...new Set([w, st.length >= 3 ? st : w, ...base])];
+}
+function parse(q){
+  let app = null; const toks = [];
+  q.toLowerCase().replace(/[^\w\s▲▼]/g," ").split(/\s+/).filter(Boolean).forEach(w => {
+    if (APPWORD[w] && !app) { app = APPWORD[w]; return; }
+    if (STOP.has(w)) return;
+    if (w.length < 2) return;
+    toks.push(w);
+  });
+  return {app, toks};
+}
+const W = {t:6,tags:5,how:3,d:1};
+function wordHit(hay, v){ return v.length <= 3 ? new RegExp("\\b" + v.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + "\\b").test(hay) : hay.includes(v); }
+function score(e, toks){
+  let total = 0, all = true;
+  for (const tk of toks){
+    const vs = variants(tk); let best = 0;
+    for (const f in W) for (const v of vs) if (wordHit(e.hay[f], v)) best = Math.max(best, W[f] * (v === tk ? 1 : .8));
+    if (!best) all = false;
+    total += best;
+  }
+  if (e.kref) total *= .7;
+  return {total, all};
+}
+
+/* ---------- rendering ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let state = {app:null, q:"", active:null, pick:null, layer:null};
+let markRe = null;
+function hl(s){ const t = esc(s); return markRe ? t.replace(markRe, m => "<mark>" + m + "</mark>") : t; }
+
+function marks(e){
+  const m = {};
+  (e.hold||[]).forEach(k => m[k[0]+","+k[1]] = ["hold","H"]);
+  (e.press||[]).forEach((k,i) => m[k[0]+","+k[1]] = ["press", e.x2 ? "2x" : e.same ? "1" : String(i+1)]);
+  return m;
+}
+function tint(k){ return "color-mix(in srgb, " + G(k.grp) + " " + Math.round((k.tint==null?.85:k.tint)*100) + "%, #262523)"; }
+
+function miniPic(e){
+  if (!e.hold && !e.press && !e.knob && !e.norns) return "";
+  const g = APPS[e.app].grid(), m = marks(e);
+  let h = '<div class="pic" aria-hidden="true"><div class="mg">';
+  for (let r = 1; r <= 8; r++) for (let c = 1; c <= 16; c++){
+    const k = g[r-1][c-1], mk = m[r+","+c];
+    const bg = k ? "color-mix(in srgb, " + G(k.grp) + " 45%, #2a2927)" : "#1e1d1c";
+    h += '<i class="' + (mk ? mk[0] : "") + '" style="background:' + bg + '">' + (mk ? mk[1] : "") + "</i>";
+  }
+  h += "</div>";
+  if (e.knob){
+    h += '<div class="me">';
+    for (let n = 1; n <= 16; n++){ const on = e.knob[0] === n; h += '<i class="' + (on ? "on" : "") + '">' + (on ? (e.knob[1] === "turn" ? "↻" : "●") : "") + "</i>"; }
+    h += "</div>";
+  }
+  h += (e.norns ? '<span class="chip">norns ' + esc(e.norns) + "</span>" : "") + "</div>";
+  return h;
+}
+
+function drawGrid(){
+  const a = state.app, g = APPS[a].grid(), e = state.active != null ? ENTRIES[state.active] : null, m = e ? marks(e) : {};
+  let h = "<div></div>";
+  for (let c = 1; c <= 16; c++) h += '<div class="num">' + c + "</div>";
+  for (let r = 1; r <= 8; r++){
+    h += '<div class="num" style="grid-row:' + (r+1) + ';grid-column:1">' + r + "</div>";
+    for (let c = 1; c <= 16; c++){
+      const k = g[r-1][c-1], mk = m[r+","+c], pos = "grid-row:" + (r+1) + ";grid-column:" + (c+1) + ";";
+      const picked = state.pick && state.pick.type === "key" && state.pick.r === r && state.pick.c === c;
+      if (!k){ h += '<div class="key dark' + (mk ? " " + mk[0] : "") + '" style="' + pos + '">' + (mk ? '<span class="hn">' + mk[1] + "</span>" : "") + "</div>"; continue; }
+      h += '<button type="button" class="key' + (mk ? " " + mk[0] : "") + (picked ? " picked" : "") + '" data-r="' + r + '" data-c="' + c + '" aria-label="Row ' + r + " key " + c + " " + esc(k.t || k.s || "") + '" style="' + pos + (mk ? "" : "background:" + tint(k) + ";border-color:" + tint(k)) + '">' +
+        (mk ? '<span class="hn">' + mk[1] + "</span>" : "") + (k.t ? '<span class="t">' + esc(k.t) + "</span>" : "") + (k.s ? '<span class="s">' + esc(k.s) + "</span>" : "") + "</button>";
+    }
+  }
+  $("grid").innerHTML = h;
+}
+function drawE16(){
+  const a = state.app, layers = Object.keys(E16[a]), e = state.active != null ? ENTRIES[state.active] : null;
+  $("layers").innerHTML = layers.length > 1 ? layers.map(l => '<button type="button" aria-pressed="' + (l === state.layer) + '" data-l="' + esc(l) + '">' + esc(l) + "</button>").join("") : "";
+  const ring = state.layer === layers[0] ? "#5a5954" : state.layer === "LOOM mode" ? "var(--g-loom)" : "var(--g-alt)";
+  $("e16").innerHTML = E16[a][state.layer].map((k,i) => {
+    const on = e && e.knob && e.knob[0] === i+1, picked = state.pick && state.pick.type === "knob" && state.pick.n === i+1;
+    if (!k[0]) return '<div class="knob empty" style="--ring:' + ring + '"></div>';
+    return '<button type="button" class="knob' + (on ? " hl" : "") + (picked ? " picked" : "") + '" data-n="' + (i+1) + '" style="--ring:' + ring + '" aria-label="Knob ' + (i+1) + " " + esc(k[0]) + '">' +
+      (on ? '<span class="hn" style="font-size:14px">' + (e.knob[1] === "turn" ? "↻" : "●") + "</span>" : "") + '<span class="t">' + esc(k[0]) + '</span><span class="s">' + esc(k[1]) + "</span></button>";
+  }).join("");
+  $("enote").textContent = KNOBNOTE[a];
+}
+function drawCap(){
+  const cap = $("cap"), e = state.active != null ? ENTRIES[state.active] : null, p = state.pick;
+  if (e){
+    cap.className = "cap";
+    cap.innerHTML = (e.badge ? '<span class="badge">' + esc(e.badge) + "</span><br>" : "") + "<b>" + esc(e.t) + '</b><div class="how">' + esc(e.how) + (e.norns ? ' <span class="chip">' + esc(e.norns) + "</span>" : "") + "</div>" + (e.d ? "<p>" + esc(e.d) + "</p>" : "");
+  } else if (p){
+    cap.className = "cap";
+    cap.innerHTML = "<b>" + esc(p.title) + "</b><p>" + esc(p.info) + "</p>";
+  } else {
+    cap.className = "cap empty";
+    cap.textContent = "Tap a key or knob to see what it does and every move that uses it. Tap a card below to light its keys here.";
+  }
+}
+
+function usesPick(e, p){
+  if (e.app !== state.app) return false;
+  if (p.type === "key") return [...(e.hold||[]), ...(e.press||[])].some(k => k[0] === p.r && k[1] === p.c);
+  return e.knob && e.knob[0] === p.n && (!e.layer || e.layer === p.layer || !e.kref);
+}
+
+function results(){
+  const {app: qApp, toks} = parse(state.q);
+  const app = qApp || state.app;
+  markRe = null;
+  let list, title, loose = false;
+  if (state.pick && !state.q){
+    list = ENTRIES.filter(e => usesPick(e, state.pick));
+    title = "Moves that use " + state.pick.title;
+  } else if (toks.length){
+    const pool = ENTRIES.filter(e => !app || e.app === app);
+    let scored = pool.map(e => ({e, ...score(e, toks)}));
+    let hits = scored.filter(x => x.all && x.total > 0);
+    if (!hits.length){ hits = scored.filter(x => x.total > 0); loose = true; }
+    hits.sort((a,b) => b.total - a.total);
+    list = hits.map(x => x.e);
+    const words = [...new Set(toks.flatMap(t => [t, stem(t)]))].filter(w => w.length >= 3).sort((a,b) => b.length - a.length);
+    if (words.length) markRe = new RegExp("(" + words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|") + ")", "gi");
+    title = (loose ? "Closest matches for " : "Results for ") + "“" + state.q.trim() + "”" + (app ? " in " + APPS[app].name : "");
+  } else {
+    list = ENTRIES.filter(e => !app || e.app === app);
+    title = app ? APPS[app].name + ": everything" : "Everything";
+  }
+  return {list, title, app, grouped: !toks.length || !!(state.pick && !state.q)};
+}
+
+function card(e, showApp){
+  return '<button type="button" class="card' + (state.active === e.id ? " on" : "") + '" data-id="' + e.id + '">' + miniPic(e) +
+    "<div>" + (showApp ? '<div class="app">' + esc(APPS[e.app].name) + " · " + esc(e.s) + "</div>" : "") +
+    (e.badge ? '<div class="badge">' + esc(e.badge) + "</div>" : "") +
+    '<div class="ct">' + hl(e.t) + '</div><div class="cw">' + hl(e.how) + "</div>" + (e.d ? '<div class="cd">' + hl(e.d) + "</div>" : "") + "</div></button>";
+}
+
+function render(){
+  const {list, title, app, grouped} = results();
+  $("rtitle").textContent = title;
+  $("count").innerHTML = list.length + (list.length === 1 ? " answer" : " answers") + ((state.q || state.pick) ? ' <button type="button" class="clear" id="reset">Show all</button>' : "");
+  let h = "";
+  if (!list.length){
+    h = '<div class="empty-state">Nothing matches. Try fewer words, or a knob or key name such as REC, LEN or SPRD.</div>';
+  } else if (grouped){
+    const apps = app ? [app] : ORDER;
+    apps.forEach(a => {
+      const mine = list.filter(e => e.app === a);
+      if (!mine.length) return;
+      if (!app) h += "<h2>" + esc(APPS[a].name) + "</h2>";
+      [...new Set(mine.map(e => e.s))].forEach(s => {
+        h += "<h3>" + esc(s) + '</h3><div class="cards">' + mine.filter(e => e.s === s).map(e => card(e, false)).join("") + "</div>";
+      });
+    });
+  } else {
+    h = '<div class="cards">' + list.map(e => card(e, true)).join("") + "</div>";
+  }
+  $("results").innerHTML = h;
+  const rs = $("reset"); if (rs) rs.onclick = () => { state.q = ""; $("q").value = ""; state.pick = null; state.active = null; renderAll(); };
+}
+
+function renderAll(){
+  const a = state.app;
+  $("chips").innerHTML = [["", "All apps"], ...ORDER.map(k => [k, APPS[k].name])].map(([k,n]) => '<button type="button" data-app="' + k + '" aria-pressed="' + ((state.app || "") === k) + '">' + esc(n) + "</button>").join("");
+  $("boardwrap").hidden = $("cap").hidden = $("legend").hidden = !a;
+  $("note").textContent = a ? APPS[a].note : "Search covers all four apps. Add an app's name to narrow it (mutated mutes), or pick an app to see its board.";
+  $("src").textContent = a ? APPS[a].src : ORDER.map(k => APPS[k].src).join(" ");
+  if (a){ if (!E16[a][state.layer]) state.layer = Object.keys(E16[a])[0]; drawGrid(); drawE16(); drawCap(); }
+  render();
+}
+
+function setApp(a){
+  state.app = a || null; state.active = null; state.pick = null; state.layer = a ? Object.keys(E16[a])[0] : null;
+  try { history.replaceState(null, "", a ? "#" + a : location.pathname); } catch (err) {}
+  try { localStorage.setItem("norns-manual-app", a || ""); } catch (err) {}
+  renderAll();
+}
+
+/* ---------- events ---------- */
+$("tries").insertAdjacentHTML("beforeend", ["mutated mutes","copy a step","skip cycles","clear a pattern","circuit breaker feedback","still spray","loom keep","fractured undo","record knob movement","save song"].map(t => '<button type="button">' + esc(t) + "</button>").join(""));
+$("tries").addEventListener("click", ev => { const b = ev.target.closest("button"); if (!b) return; $("q").value = b.textContent; onSearch(); $("q").focus(); });
+let timer;
+function onSearch(){
+  state.q = $("q").value; state.pick = null; state.active = null;
+  const {app} = parse(state.q);
+  if (app && app !== state.app){ state.app = app; state.layer = Object.keys(E16[app])[0]; try { history.replaceState(null, "", "#" + app); } catch (err) {} }
+  renderAll();
+}
+$("q").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(onSearch, 120); });
+$("qx").addEventListener("click", () => { $("q").value = ""; onSearch(); $("q").focus(); });
+$("chips").addEventListener("click", ev => { const b = ev.target.closest("button"); if (b) setApp(b.dataset.app); });
+$("layers").addEventListener("click", ev => { const b = ev.target.closest("button"); if (!b) return; state.layer = b.dataset.l; drawE16(); });
+$("grid").addEventListener("click", ev => {
+  const b = ev.target.closest("button.key"); if (!b) return;
+  const r = +b.dataset.r, c = +b.dataset.c, k = APPS[state.app].grid()[r-1][c-1];
+  const same = state.pick && state.pick.type === "key" && state.pick.r === r && state.pick.c === c;
+  state.active = null; state.q = ""; $("q").value = "";
+  state.pick = same ? null : {type:"key", r, c, title:"row " + r + ", key " + c + (k.t ? " (" + k.t + ")" : ""), info:k.i || ""};
+  drawGrid(); drawE16(); drawCap(); render();
+});
+$("e16").addEventListener("click", ev => {
+  const b = ev.target.closest("button.knob"); if (!b) return;
+  const n = +b.dataset.n, k = E16[state.app][state.layer][n-1], base = E16[state.app][Object.keys(E16[state.app])[0]][n-1];
+  const same = state.pick && state.pick.type === "knob" && state.pick.n === n && state.pick.layer === state.layer;
+  state.active = null; state.q = ""; $("q").value = "";
+  state.pick = same ? null : {type:"knob", n, layer:state.layer, title:"knob " + n + " (" + k[0] + ")", info:(k[2] || base[2] || k[1])};
+  drawGrid(); drawE16(); drawCap(); render();
+});
+$("results").addEventListener("click", ev => {
+  const b = ev.target.closest(".card"); if (!b) return;
+  const e = ENTRIES[+b.dataset.id];
+  if (state.app !== e.app){ state.app = e.app; try { history.replaceState(null, "", "#" + e.app); } catch (err) {} }
+  state.active = state.active === e.id ? null : e.id;
+  const layers = Object.keys(E16[e.app]);
+  state.layer = e.layer && E16[e.app][e.layer] ? e.layer : (state.layer && E16[e.app][state.layer] && !e.layer ? state.layer : layers[0]);
+  renderAll();
+  if (state.active != null) $("boardwrap").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
+});
+document.addEventListener("keydown", ev => { if (ev.key === "/" && document.activeElement !== $("q")){ ev.preventDefault(); $("q").focus(); } });
+function fromHash(){ const h = location.hash.replace("#",""); return APPS[h] ? h : null; }
+window.addEventListener("hashchange", () => { const h = fromHash(); if (h !== state.app) setApp(h); });
+
+let start = fromHash();
+if (!start){ try { const s = localStorage.getItem("norns-manual-app"); if (APPS[s]) start = s; } catch (err) {} }
+state.app = start; state.layer = start ? Object.keys(E16[start])[0] : null;
+renderAll();
+}
+</script>
+</body>
+</html>
