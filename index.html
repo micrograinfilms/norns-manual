@@ -496,7 +496,8 @@ fractured: [
  ["Screen","Change screen pages","Press PG1 to PG4.","Play, rec, setup, fx.",{press:[[8,11]],tags:"page screen"}],
  ["Saving","Save everything (PSET)","norns PARAMS, then PSET.","Every setting, all sixteen patterns and the listening loop. Patterns come back stopped.",{tags:"pset save load"}],
  ["Saving","Save a new numbered PSET","PARAMETERS, then save new PSET (the first item).","Saves into the slot after the highest in use, named FRAC plus the slot number (FRAC 002 in slot 2). No typing; the name always matches the slot. Slot 1 is kept for INT.",{cheat:true,menu:"PARAMETERS › save new PSET",tags:"pset save new number name slot quick"}],
- ["Saving","Autosave","Automatically.","Saves on close and every three minutes while you play, separately from PSETs.",{tags:"autosave"}],
+ ["Saving","Start from blank","Load PSET 1, INT.","INT has all four loops empty, starting settings, no patterns and a silent listening loop. Made the first time Fractured opens with slot 1 empty. An empty loop's key stays dim and plays nothing until you load a sample on page 3.",{tags:"new blank empty init int"}],
+  ["Saving","Autosave","Automatically.","Saves on close and every three minutes while you play, separately from PSETs.",{tags:"autosave"}],
  ["Audio and setup","Record the norns's audio","Hold E16 knob 16 for a second. Again to stop.","Takes go to dust/audio/tape. Separate from saving the listening loop.",{knob:[16,"push"],tags:"record tape bounce wav"}]
 ],
 still: [
