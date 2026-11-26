@@ -420,6 +420,7 @@ mutated: [
  ["TEMP","Save the TEMP version as a new song","TEMP on, open the slots, press an empty slot.","TEMP stays on, and when it ends the song goes back to the slot you were on.",{badge:"TEMP on, slots open",press:[[1,4]],tags:"save temp"}],
  ["TEMP","Keep the TEMP changes","TEMP on, open the slots, press this song's slot.","Saved there, and TEMP ends without snapping back. Other full slots aren't touched while TEMP is on.",{badge:"TEMP on, slots open",press:[[1,3]],tags:"keep save temp"}],
  ["Saving","Save a song by name (PSET)","norns PARAMETERS, then PSET, then SAVE.","A PSET keeps the whole song, like a slot, plus the norns menu settings. Loading one saves the song you leave to its own slot first.",{tags:"pset save name"}],
+ ["Saving","Save a new numbered PSET","PARAMETERS, then save new PSET (the first item).","Saves into the slot after the highest in use, named MUTATED plus the slot number (MUTATED 002 in slot 2). No typing; the name always matches the slot. Slot 1 stays INT.",{cheat:true,menu:"PARAMETERS › save new PSET",tags:"pset save new number name slot quick"}],
  ["Saving","Start from a blank song","Load PSET 1, INT.","INT is a blank song: no steps, one cycle, starting settings and starting samples. Save it as a new PSET to keep INT clean.",{tags:"new blank empty init int"}],
  ["Saving","Where things are saved","Automatically.","Everything saves to dust/data/mutated/state.data; slots in dust/data/mutated/presets, one file per slot.",{tags:"autosave file data"}],
  ["Audio and setup","Record the norns's audio","Hold E16 knob 16 for a second. Again to stop.","Takes are saved as numbered WAVs in dust/audio/tape.",{knob:[16,"push"],tags:"record tape bounce wav"}],
@@ -461,6 +462,7 @@ cb: [
  ["Reverb","Shape the reverb","PARAMETERS, reverb.","Decay 0.3 to 20 s (3.5 default), tone dark, warm or bright, and size.",{tags:"reverb decay tone size"}],
  ["Screen","Change screen pages","Press PG1 to PG4, or turn norns E1.","Network, loop, envelope, files.",{press:[[8,11]],norns:"E1",tags:"page screen"}],
  ["Saving","Save a sound (PSET)","norns PARAMETERS, then PSET, then SAVE.","Keeps every setting of all four strips, the reverb, the cables and all sixteen patterns.",{tags:"pset save load"}],
+ ["Saving","Save a new numbered PSET","PARAMETERS, then save new PSET (the first item).","Saves into the slot after the highest in use, named CIRCUIT BREAK plus the slot number (CIRCUIT BREAK 002 in slot 2). No typing; the name always matches the slot. Slot 1 is kept for INT.",{cheat:true,menu:"PARAMETERS › save new PSET",tags:"pset save new number name slot quick"}],
  ["Saving","Autosave","Automatically.","Saves when the script closes and every three minutes while you play.",{tags:"autosave"}],
  ["Audio and setup","Record the norns's audio","Hold E16 knob 16 for a second. Again to stop.","The E16 title shows REC and the time. Takes go to dust/audio/tape.",{knob:[16,"push"],tags:"record tape bounce wav"}],
  ["Audio and setup","Keep knob names showing","PARAMETERS, EDIT, readings on moves (under e16): off.","Turning a knob still shows its reading.",{tags:"e16 readings names"}]
@@ -493,6 +495,7 @@ fractured: [
  ["Sound","Mutator settings","norns PARAMS.","Mutator level, pitch (same, octaves or scale notes), shortest fragment, take away amount, and mutators into buffer.",{tags:"mutators settings"}],
  ["Screen","Change screen pages","Press PG1 to PG4.","Play, rec, setup, fx.",{press:[[8,11]],tags:"page screen"}],
  ["Saving","Save everything (PSET)","norns PARAMS, then PSET.","Every setting, all sixteen patterns and the listening loop. Patterns come back stopped.",{tags:"pset save load"}],
+ ["Saving","Save a new numbered PSET","PARAMETERS, then save new PSET (the first item).","Saves into the slot after the highest in use, named FRAC plus the slot number (FRAC 002 in slot 2). No typing; the name always matches the slot. Slot 1 is kept for INT.",{cheat:true,menu:"PARAMETERS › save new PSET",tags:"pset save new number name slot quick"}],
  ["Saving","Autosave","Automatically.","Saves on close and every three minutes while you play, separately from PSETs.",{tags:"autosave"}],
  ["Audio and setup","Record the norns's audio","Hold E16 knob 16 for a second. Again to stop.","Takes go to dust/audio/tape. Separate from saving the listening loop.",{knob:[16,"push"],tags:"record tape bounce wav"}]
 ],
@@ -535,6 +538,9 @@ still: [
  ["Patterns and TEMP","Change a pattern's speed","Hold SPD, press the pattern.","Normal, half, quarter and double.",{hold:[[8,10]],press:[[7,12]],tags:"speed half double"}],
  ["Patterns and TEMP","Clear a pattern","Hold DUB and SPD, press the pattern.","",{hold:[[8,9],[8,10]],press:[[7,12]],tags:"clear delete erase pattern"}],
  ["Patterns and TEMP","Try changes, then snap back","Hold TEMP while changing knobs, freezes or sounds.","They snap back when you let go. Double tap to keep it on; tap again to snap back. The E16 rests pink.",{hold:[[8,14]],knob:[9,"turn"],tags:"temp temporary"}],
+ ["Saving","Save everything (PSET)","norns PARAMETERS, then PSET, then SAVE.","Keeps every voice's sound and settings and all sixteen patterns. Loading one puts it in place right away.",{tags:"pset save load"}],
+ ["Saving","Save a new numbered PSET","PARAMETERS, then save new PSET (the first item).","Saves into the slot after the highest in use, named STILL plus the slot number (STILL 002 in slot 2). No typing; the name always matches the slot. Slot 1 is kept for INT.",{cheat:true,menu:"PARAMETERS › save new PSET",tags:"pset save new number name slot quick"}],
+ ["Saving","Start from blank","Load PSET 1, INT.","INT has no sounds, every voice at its starting settings and no patterns. Made the first time Still opens with slot 1 empty.",{tags:"new blank empty init int"}],
  ["Audio and setup","Record the norns's audio","Hold E16 knob 16 for a second. Again to stop.","Takes go to dust/audio/tape.",{knob:[16,"push"],tags:"record tape bounce wav"}],
  ["Audio and setup","Something went wrong","Check dust/data/still/lua_log.txt and engine_log.txt.","Loading, closing, errors and sound trimming are logged. State is in state.data, with a copy made each time Still opens.",{tags:"error log crash bug"}]
 ]};
@@ -543,7 +549,7 @@ const APPS = {
   mutated:{name:"Mutated",grid:mutatedGrid,note:"Rows 1 to 6 are the tracks on the current page: T1 to T6 on page C, T7 to T12 on page T. Row 7 is the cycle row. Keys 4 to 7 on the bottom row are step pages.",src:"From the Mutated README and code, Nov 25, 2026 (includes mutes and whole page changes)."},
   cb:{name:"Circuit Breaker",grid:cbGrid,note:"Rows 1 to 4 are the strips of loops 1 to 4, each laid out the same way and ending at OUT, as on the screen. Rows 5 to 8 transpose loops 1 to 4. Columns 9, 10 and 15 stay dark.",src:"From the Circuit Breaker README, Nov 25, 2026."},
   fractured:{name:"Fractured",grid:frGrid,note:"Column 1 is velocity, columns 2 to 8 the in key keyboard. Patterns and pages sit where they do in Circuit Breaker.",src:"From the Fractured README, Nov 24, 2026 (RIPL renamed TAPE)."},
-  still:{name:"Still",grid:stillGrid,note:"Rows 1 to 6 are voices 1 to 6, each key a position in that voice's sound. Row 7 is patterns 1 to 16. On the real grid only each voice's position lights.",src:"From Still's code as of Nov 25, 2026 (spray, LIFT and LOOM included; its README hasn't caught up yet)."}
+  still:{name:"Still",grid:stillGrid,note:"Rows 1 to 6 are voices 1 to 6, each key a position in that voice's sound. Row 7 is patterns 1 to 16. On the real grid only each voice's position lights.",src:"From Still's code as of Nov 26, 2026 (spray, LIFT, LOOM and PSETs included)."}
 };
 const ORDER = ["mutated","cb","fractured","still"];
 
@@ -797,6 +803,7 @@ function keyName(e, k){
 }
 function isCheat(e){
   if (e.kref) return false;
+  if (e.cheat) return true;
   const h = e.hold || [], p = e.press || [];
   return h.length > 0 || e.x2 || p.length > 1 || (e.knob && e.knob[1] === "push") || (e.norns && /hold|\+|let go|right|K\d/i.test(e.norns));
 }
@@ -827,6 +834,7 @@ function comboHTML(e){
     parts.push((h.length || pr ? (h.length && !pr ? "→ " : "+ ") : "") + chip(t, rec ? "r" : "k") + (layer !== Object.keys(E16[e.app])[0] && layer !== "Select held" ? ' <i>(' + esc(layer) + ")</i>" : ""));
   }
   if (e.norns) parts.push((parts.length ? "+ " : "") + chip(e.norns, "n"));
+  if (e.menu) parts.push(chip(e.menu, "n"));
   return parts.join(" ");
 }
 function drawSheet(){
